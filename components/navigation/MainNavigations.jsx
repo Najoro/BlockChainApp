@@ -44,7 +44,6 @@ const optionScreen = ({ route }) => ({
     return <Ionicons name={iconName} size={size} color={color} />;
   },
   tabBarStyle: {
-    height: 90,
-    justifyContent : "center"
+
   },
 })

@@ -7,7 +7,7 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label }) => {
   return (
     <View style={styles.flexCenter}>
       <View style={styles.icone}>
-        <IconLibrary name={iconName} size={50} color="white" />
+        <IconLibrary name={iconName} size={30} color="white" />
       </View>
       <Text style={styles.text}>{label}</Text>
     </View>
@@ -80,8 +80,8 @@ const styles = {
   },
   icone: {
     backgroundColor: "#578FCA",
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderRadius: 50,
     display: "flex",
     justifyContent: "center",
