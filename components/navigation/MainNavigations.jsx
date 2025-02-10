@@ -30,6 +30,7 @@ export default function MainNavigations() {
 
 
 const optionScreen = ({ route }) => ({
+  headerShown: false,
   tabBarIcon: ({ color, size }) => {
     let iconName;
 
