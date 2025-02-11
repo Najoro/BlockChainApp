@@ -5,6 +5,9 @@ import {
   useWindowDimensions,
   StyleSheet,
   ScrollView,
+  Button,
+  Alert,
+  TouchableOpacity,
 } from "react-native";
 
 import Feather from "@expo/vector-icons/Feather";
@@ -18,9 +21,11 @@ import BuyCrypto from "./HomeContent/BuyCrypto";
 const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label }) => {
   return (
     <View style={styles.flexCenter}>
-      <View style={styles.icone}>
-        <IconLibrary name={iconName} size={30} color="white" />
-      </View>
+      <TouchableOpacity onPress={() => {alert(`${label}`)}}>
+        <View style={styles.icone} >
+          <IconLibrary name={iconName} size={30} color="white" />
+        </View>
+      </TouchableOpacity>
       <Text style={styles.text}>{label}</Text>
     </View>
   );
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
 
   text: {
     color: "white",
-    fontSize: 20,
+    fontSize: 16,
     marginTop: 5,
   },
   header: {

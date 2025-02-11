@@ -23,7 +23,6 @@ export default function MainNavigations() {
           <Tab.Screen name={homeName} component={Home} />
           <Tab.Screen name={historyName} component={History} />
           <Tab.Screen name={profileName} component={Profile} />
-          
         </Tab.Navigator>
   );
 }
