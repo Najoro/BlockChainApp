@@ -20,6 +20,13 @@ function MyWallet() {
           title="$45852222"
           description="0.002"
         />
+        <ImageTextCard
+          imageSource={{
+            uri: "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafkreihaxcjvq6ugz5msv4axd5g6sh5jerxxfowhphdsucz2y4kabtvl5y",
+          }}
+          title="$45852222"
+          description="0.002"
+        />
       </SafeAreaView>
     </>
   );

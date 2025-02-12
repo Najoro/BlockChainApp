@@ -6,8 +6,8 @@ function SellCrypto() {
   return (
     <>
       <View style={styles.container}>
-        <InputCustom label="From" />
-        <InputCustom label="To" />
+        <InputCustom label="Depuis" />
+        <InputCustom label="Vers" />
       </View>
     </>
 )

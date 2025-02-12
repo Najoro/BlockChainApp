@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   Text,
   View,
   useWindowDimensions,
   StyleSheet,
   ScrollView,
+  TouchableOpacity
 } from "react-native";
-
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import TabsView from "../../functions/TabsView";
@@ -15,53 +16,42 @@ import EmptyWallet from "./HomeContent/EmptyWallet";
 import SellCrypto from "./HomeContent/SellCrypto";
 import BuyCrypto from "./HomeContent/BuyCrypto";
 
-const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label }) => {
+const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.flexCenter}>
-      <View style={styles.icone}>
-        <IconLibrary name={iconName} size={30} color="white" />
+    <TouchableOpacity onPress={() => navigation.navigate(screen)}>
+      <View style={styles.flexCenter}>
+        <View style={styles.icone}>
+          <IconLibrary name={iconName} size={30} color="white" />
+        </View>
+        <Text style={styles.text}>{label}</Text>
       </View>
-      <Text style={styles.text}>{label}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
+
 function Home() {
   return (
     <>
       <ScrollView style={styles.container}>
-        <View style={[styles.content, styles.soldContent]}>
+        <View style={[styles.haead, styles.soldContent]}>
           <View style={styles.header}>
             <Text style={styles.sol}>$27,852</Text>
           </View>
           <View style={styles.menu}>
-            <MenuIcon
-              iconLibrary={Feather}
-              iconName="arrow-down-left"
-              label="Receive"
-            />
-            <MenuIcon
-              iconLibrary={Feather}
-              iconName="arrow-up-right"
-              label="Send"
-            />
-            <MenuIcon
-              iconLibrary={Feather}
-              iconName="refresh-cw"
-              label="Exchange"
-            />
-            <MenuIcon
-              iconLibrary={FontAwesome}
-              iconName="money"
-              label="Cash out"
-            />
+            <MenuIcon iconLibrary={Feather} iconName="arrow-down-left" label="Recevoir" screen="Recevoir" />
+            <MenuIcon iconLibrary={Feather} iconName="arrow-up-right" label="Envoyer" screen="Envoyer" />
+            <MenuIcon iconLibrary={Feather} iconName="refresh-cw" label="Échanger" screen="Échanger" />
+            <MenuIcon iconLibrary={FontAwesome} iconName="money" label="Encaisser" screen="Encaisser" />
           </View>
+
         </View>
 
         <View style={[styles.content, styles.walletContent]}>
           <TabsView
             routes={[
-              { key: "first", title: "My Wallet" },
-              { key: "second", title: "Empty wallets" },
+              { key: "first", title: "Mon Portefeuille" },
+              { key: "second", title: "Portefeuilles vides" },
             ]}
             sceneMap={{
               first: MyWallet,
@@ -73,8 +63,8 @@ function Home() {
         <View style={[styles.content, styles.walletContent]}>
           <TabsView
             routes={[
-              { key: "first", title: "But Crypto" },
-              { key: "second", title: "Sell Crypto" },
+              { key: "first", title: "Acheter des cryptos" },
+              { key: "second", title: "Vendre des cryptos" },
             ]}
             sceneMap={{
               first: BuyCrypto,
@@ -88,38 +78,36 @@ function Home() {
 }
 
 const styles = StyleSheet.create({
+  haead: {
+    height: "35%",
+  },
   container: {
-    // flex: 1,
-    backgroundColor: "#ffff0",
+    minHeight: "auto",
   },
   content: {
     minHeight: 300,
   },
   soldContent: {
-    backgroundColor: "#3674B5",
+    backgroundColor: "#0000FF",
     justifyContent: "space-around",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   walletContent: {
-    flex: 1 / 2,
     backgroundColor: "#fff",
-    marginTop: 20,
+    marginTop: 5,
   },
-
   text: {
     color: "white",
-    fontSize: 20,
+    fontSize: 15,
     marginTop: 5,
   },
   header: {
-    // backgroundColor :"red",
     justifyContent: "center",
     alignItems: "center",
   },
   sol: {
-    fontSize: 50,
+    fontSize: 40,
     color: "#fff",
-    fontWeight: "bold",
   },
   flexCenter: {
     justifyContent: "center",
@@ -127,15 +115,16 @@ const styles = StyleSheet.create({
   },
   icone: {
     backgroundColor: "#578FCA",
-    width: 70,
-    height: 70,
+    width: 65,
+    height: 65,
     borderRadius: 50,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   menu: {
-    flex: 1 / 2,
+    height: "auto",
+    marginTop: -25,
     flexDirection: "row",
     justifyContent: "space-around",
   },
