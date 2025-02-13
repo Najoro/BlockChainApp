@@ -30,15 +30,18 @@ const Stack = createStackNavigator();
 // }
 
 // 🔹 Tab Navigator principal
+const HomeName = "Home";
+const HistoryName = "history";
+const ProfileName = "Profile";
 export default function MainNavigation() {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName={HomeName}
       screenOptions={optionScreen}
     >
-      <Tab.Screen name="Home" component={MenuNavigation} />
-      <Tab.Screen name="History" component={History} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name={HomeName} component={MenuNavigation} />
+      <Tab.Screen name={HistoryName} component={History} />
+      <Tab.Screen name={ProfileName} component={Profile} />
     </Tab.Navigator>
   );
 }
@@ -48,11 +51,11 @@ const optionScreen = ({ route }) => ({
   tabBarIcon: ({ color, size }) => {
     let iconName;
 
-    if (route.name === homeName) {
+    if (route.name === HomeName) {
       iconName = 'home-outline';
-    } else if (route.name === historyName) {
+    } else if (route.name === HistoryName) {
       iconName = 'time-outline';
-    } else if (route.name === profileName) {
+    } else if (route.name === ProfileName) {
       iconName = 'person-outline';
     }
 
