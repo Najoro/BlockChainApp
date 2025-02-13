@@ -4,8 +4,8 @@ import MainNavigations from "../components/navigation/MainNavigations";
 export default function Index() {
   return (
     <View style = {{flex : 1}}>
-      {/* <AuthScreen/> */}
-      <MainNavigations />
+      <AuthScreen/>
+      {/* <MainNavigations /> */}
     </View>
   );
 }
