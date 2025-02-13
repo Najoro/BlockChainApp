@@ -1,171 +1,156 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
+import Content from "../screens/HistoryContent/Content";
 
 function History() {
-  const [filter, setFilter] = useState("ALL");
-
+  const [filter, setFilter] = useState("TOUT");
+  
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
-      {/* Header avec titre History et sous-menu de filtrage */}
+    <ScrollView style={styles.container}>
+      {/* En-tête avec titre et filtre */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>History</Text>
-        
-        {/* Sous-menu de filtrage */}
+        <Text style={styles.headerText}>Historique</Text>
         <View style={styles.filterContainer}>
-          {["ALL", "BTC", "ETH", "LTC"].map((currency) => (
+          {["TOUT", "BTC", "ETH", "LTC"].map((currency) => (
             <TouchableOpacity
               key={currency}
-              style={[
-                styles.filterButton,
-                filter === currency && styles.activeFilterButton, // Mettre en évidence le bouton actif
-              ]}
+              style={[styles.filterButton, filter === currency && styles.activeFilterButton]}
               onPress={() => setFilter(currency)}
             >
-              <Text
-                style={[
-                  styles.filterText,
-                  filter === currency && styles.activeFilterText, // Change la couleur du texte pour le bouton actif
-                ]}
-              >
+              <Text style={[styles.filterText, filter === currency && styles.activeFilterText]}>
                 {currency}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
-
-      {/* Bloc Total des Transactions (Sent et Received) */}
+      
+      {/* Résumé des transactions */}
       <View style={styles.transactionSummary}>
-        <View style={styles.totalRow}>
-          <View style={styles.transactions}>
-            <Feather name="arrow-up-right" size={20} color="#3674B5" />
-            <View>
-              <Text style={styles.totalLabel}>Sent</Text>
-              <Text style={styles.totalValue}>$1,250</Text>
-            </View>
+        <View style={styles.transactionItem}>
+          <Feather name="arrow-up-right" size={20} color="#3674B5" />
+          <View>
+            <Text style={styles.totalLabel}>Envoyé</Text>
+            <Text style={styles.totalValue}>$1,250</Text>
           </View>
         </View>
-        <View style={styles.totalRow}>
-          <View style={styles.transactions}>
-            <Feather name="arrow-down-left" size={20} color="#3674B5" />
-            <View>
-              <Text style={styles.totalLabel}>Received</Text>
-              <Text style={styles.totalValue}>$500</Text>
-            </View>
+        <View style={styles.transactionItem}>
+          <Feather name="arrow-down-left" size={20} color="#3674B5" />
+          <View>
+            <Text style={styles.totalLabel}>Reçu</Text>
+            <Text style={styles.totalValue}>$500</Text>
           </View>
         </View>
       </View>
-
-      {/* Barre de recherche séparée */}
+      
+      {/* Barre de recherche */}
       <View style={styles.searchContainer}>
-        <TextInput placeholder="Export History" style={styles.searchInput} />
+        <TextInput placeholder="Exporter l'historique" style={styles.searchInput} />
         <TouchableOpacity style={styles.searchButton}>
           <Feather name="search" size={20} color="#3674B5" />
         </TouchableOpacity>
       </View>
-    </View>
+      
+      {/* Contenu de l'historique */}
+      <View style={styles.content}>
+        <Content date="Aujourd'hui, 10 Février" />
+        <Content date="15 Février" />
+      </View>
+    </ScrollView>
   );
 }
 
 export default History;
 
-const styles = {
+const styles = StyleSheet.create({
+  container: {
+    maxheight:'100%',
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    overflow: 'hidden',
+  },
   header: {
-    backgroundColor: "#3674B5",
+    backgroundColor: "#0000FF",
+    height: "26%",
     padding: 20,
-    height: "33%", // Utilisation d'un tiers de la page pour le header
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
+    justifyContent:'space-around'
   },
   headerText: {
     color: "white",
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 25,
   },
   filterContainer: {
     flexDirection: "row",
-    marginTop: 10,
-    justifyContent: "center",
+    marginBottom: 40
   },
   filterButton: {
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginHorizontal: 10,
+    borderRadius: 5,
   },
   activeFilterButton: {
-    // Pas de couleur de fond
   },
   filterText: {
-    color: "#A9A9A9", // Gris pour l'option non sélectionnée
+    color: "#D3D3D3",
     fontSize: 16,
-    fontWeight: "bold",
   },
   activeFilterText: {
-    color: "white", // Blanc pour l'option sélectionnée
+    color: "white",
   },
   transactionSummary: {
+    marginTop: -60,
     backgroundColor: "white",
     flexDirection: "row",
-    justifyContent: "space-around",
-    borderRadius: 10,
+    justifyContent: "space-evenly",
     padding: 20,
-    width: "90%",
-    marginTop: -70, // Centré juste sous le header
-    alignSelf: "center", // Centré horizontalement
+    margin: 15,
+    borderRadius: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
   },
-  transactions: {
+  transactionItem: {
     flexDirection: "row",
-  },
-  totalRow: {
-    flexDirection: "column",
-    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
   },
   totalLabel: {
-    color: "#000",
     fontSize: 16,
     marginLeft: 10,
   },
   totalValue: {
-    color: "#3674B5",
     fontSize: 16,
     fontWeight: "bold",
+    color: "#3674B5",
     marginLeft: 10,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 25,
-    marginTop: 10,
+    backgroundColor: "white",
+    marginBottom: 5,
+    marginHorizontal: 15,
     paddingHorizontal: 15,
-    paddingVertical: 10,
-    justifyContent: "flex-start", // Aligner à gauche
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 1,
   },
   searchInput: {
     flex: 1,
-    backgroundColor: "#F7F7F7",
     height: 40,
     fontSize: 16,
     color: "#000",
-    marginRight: 30, // Espace entre le champ texte et le bouton
-    paddingLeft: 15,
-    borderRadius: 25,
-    borderWidth: 1,
   },
   searchButton: {
-    borderWidth: 1,
-    borderColor: "#3674B5",
-    borderRadius: 50,
     padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
   },
-};
+  content:{
+    marginBottom:80
+  }
+});
