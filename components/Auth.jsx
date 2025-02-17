@@ -1,33 +1,51 @@
-import { TouchableOpacity, StyleSheet, Text, View } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import {keycloakConfig} from './keycloak/KeycloakConfig';
-import {authorize} from 'react-native-app-auth';
+import { TouchableOpacity, StyleSheet, Text, View, Linking} from 'react-native'
 
-const REDIRECT_URI = 'myapp://callback';
-const CLIENT_ID = 'BlockchainApp';
-const keycloakURL = `https://preprod.sso.eqima.org/realms/blockchain/protocol/openid-connect/auth` +
-  `?client_id=${CLIENT_ID}` +
-  `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-  `&response_type=code` +
-  `&scope=openid profile email` +
-  `&kc_idp_hint=google`;
+import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import {keycloakConfig} from './keycloak/KeycloakConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
+
+const handleLogin = async() => {
+    const authUrl = `${keycloakConfig.serviceConfiguration.authorizationEndpoint}?client_id=${keycloakConfig.clientId}&response_type=code&scope=openid profile email&redirect_uri=${encodeURIComponent(keycloakConfig.redirectUrl)}`;
+    const supported = await Linking.canOpenURL(authUrl);
+
+    if (supported) {
+      const url = await Linking.openURL(authUrl);
+      // console.log("url : ", url);
+      
+    } else {
+      console.error("Impossible d'ouvrir l'URL : ", authUrl);
+    }
+  };
+
 
 const Auth = () => {
   const navigation = useNavigation();
+  const [token, setToken] = useState(null);
 
-  const handleLogin = async() => {
-    // Logique de connexion ici
-    // navigation.navigate("Home")
-    try {
-      const result = await authorize(keycloakConfig);
-      console.log("Connexion réussie : ", result);
-    } catch (error) {
-      console.error("Erreur de connexion :", error);
-    }
-  };
+  useEffect(() => {
+    const handleUrl = async (event) => {
+      const { url } = event;
+      if(url) {
+        setToken(url);
+        console.log("true");
+        
+      }
+      
+    };
+    
+    const t = Linking.addEventListener("url", handleUrl);
+
+    console.log(t);
+    return () => {
+      Linking.removeAllListeners("url");
+    };
+    
+  }, []);
+  
   return (
-    <View style={styles.container}>
+  <View style={styles.container}>
     <Text style={styles.welcomeText}>Bienvenue</Text>
     <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
       <Text style={styles.loginText}>Se connecter</Text>
