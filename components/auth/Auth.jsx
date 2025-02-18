@@ -2,7 +2,7 @@ import { TouchableOpacity, StyleSheet, Text, View, Linking } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { keycloakConfig } from './keycloak/KeycloakConfig';
+import { keycloakConfig } from '../keycloak/KeycloakConfig';
 
 const Auth = () => {
   const navigation = useNavigation();

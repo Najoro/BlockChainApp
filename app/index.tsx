@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import AuthScreen from "../components/Auth"
+import AuthScreen from "../components/auth/Auth"
 import { NavigationContainer } from '@react-navigation/native';
 import MainNavigations from "../components/navigation/MainNavigations";
 export default function Index() {
