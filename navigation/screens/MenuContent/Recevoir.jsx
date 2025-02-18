@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet , TouchableOpacity,Alert } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import DropdownComponent from "../../../components/DropdownComponent ";
-import Clipboard  from "@react-native-clipboard/clipboard";
+// import Clipboard  from "@react-native-clipboard/clipboard";
 
 function Recevoir() {
   const walletAddress = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"; // Adresse fictive Bitcoin
@@ -12,7 +12,7 @@ function Recevoir() {
   }
   
   const handleCopieClick = () => {
-    Clipboard.setString(walletAddress);
+    // Clipboard.setString(walletAddress);
     Alert.alert('Copié !', 'Le texte a été copié dans le presse-papiers.');
     }
 
