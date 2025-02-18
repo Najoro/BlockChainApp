@@ -1,16 +1,55 @@
 import React, { useState } from "react";
 import { View, Text, Image, TextInput, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { keycloakConfig } from "@/components/keycloak/KeycloakConfig";
+import { Linking } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [token, setToken] = useState(null);
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState("Lanja");
   const [bio, setBio] = useState("Crypto Enthusiast");
   const [profilePic, setProfilePic] = useState("https://randomuser.me/api/portraits/men/1.jpg");
 
+  const clearAuthToken = async () => {
+    try {
+      await AsyncStorage.setItem('authToken', ''); // Met le token à une valeur vide
+      console.log("Token supprimé avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du token :", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Supprime le token de AsyncStorage
+      await AsyncStorage.removeItem("authToken");
+  
+      // Réinitialise l'état local
+      setToken(null);
+      setIsAuthenticated(false);
+  
+      // Effectue la déconnexion côté Keycloak
+      const logoutUrl = `${keycloakConfig.serviceConfiguration.revocationEndpoint}?client_id=${keycloakConfig.clientId}&post_logout_redirect_uri=${encodeURIComponent(keycloakConfig.redirectUrl)}`;
+      await Linking.openURL(logoutUrl);
+  
+      // Force la redirection vers Login et empêche le retour en arrière
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+  
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Profil */}
       <View style={styles.profileSection}>
         <Image source={{ uri: profilePic }} style={styles.profileImage} />
         <Text style={styles.profileName}>{name}</Text>
@@ -21,13 +60,11 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Solde total */}
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>Solde total</Text>
         <Text style={styles.balanceAmount}>$27,852</Text>
       </View>
 
-      {/* Crypto détenues */}
       <View style={styles.cryptoCard}>
         <Text style={styles.cryptoLabel}>Mes Cryptos</Text>
         {[ 
@@ -42,13 +79,11 @@ const ProfileScreen = () => {
         ))}
       </View>
 
-      {/* Bouton Déconnexion */}
-      <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8}>
+      <TouchableOpacity style={styles.logoutButton} activeOpacity={0.8} onPress={handleLogout}>
         <FontAwesome name="sign-out" size={20} color="white" style={{ marginRight: 10 }} />
         <Text style={styles.logoutButtonText}>Déconnexion</Text>
       </TouchableOpacity>
 
-      {/* Modal de modification du profil */}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
