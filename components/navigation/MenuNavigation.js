@@ -1,10 +1,10 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import Recevoir from './screens/MenuContent/Recevoir';
-import Envoyer from './screens/MenuContent/Envoyer';
-import Echanger from './screens/MenuContent/Echanger';
-import Encaisser from './screens/MenuContent/Encaisser';
-import Home from './screens/Home';
+import Recevoir from '../screens/MenuContent/Recevoir';
+import Envoyer from '../screens/MenuContent/Envoyer';
+import Echanger from '../screens/MenuContent/Echanger';
+import Encaisser from '../screens/MenuContent/Encaisser';
+import Home from '../screens/HomeContent/Home';
 
 const Stack = createStackNavigator();
 

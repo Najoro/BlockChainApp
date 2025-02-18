@@ -1,30 +1,32 @@
-// import { Stack } from "expo-router";
-
-// export default function RootLayout() {
-//   return <Stack screenOptions={{
-//     headerShown : false,
-//   }} />;
-// }
-
-import Auth from "@/components/Auth";
-import MainNavigations from "@/components/navigation/MainNavigations";
+import React from 'react';
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from '@react-navigation/stack';
+import StackNavigation from "../components/navigation/StackNavigation";
+import { AuthProvider, useAuth } from "../components/auth/AuthProvider";
+import { View, ActivityIndicator } from "react-native";
+import Auth from "../components/auth/Auth";
 
-
-// import { Stack } from "expo-router";
-
-
-
-const Stack = createStackNavigator();
-
-export default function RootLayout() {
+const RootLayout = () => {
   return (
-    <>
-        <Stack.Navigator initialRouteName="Login" screenOptions={{headerShown : false}}>
-          <Stack.Screen name="Login" component={Auth} />
-          <Stack.Screen name="Home" component={MainNavigations} />
-        </Stack.Navigator>
-    </>
+    <AuthProvider>
+      <NavigationContainer>
+        <AuthWrapper />
+      </NavigationContainer>
+    </AuthProvider>
   );
-}
+};
+
+const AuthWrapper = () => {
+  const { userToken, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
+
+  return userToken ? <StackNavigation /> : <Auth />;
+};
+
+export default RootLayout;

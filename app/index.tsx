@@ -1,11 +1,5 @@
-import { Text, View } from "react-native";
-import AuthScreen from "../components/auth/Auth"
-import { NavigationContainer } from '@react-navigation/native';
-import MainNavigations from "../components/navigation/MainNavigations";
+import RootLayout from "./_layout";
+
 export default function Index() {
-  return (
-    <View style={{flex:1}}>
-      <MainNavigations />
-    </View>
-  );
+  return <RootLayout />;
 }

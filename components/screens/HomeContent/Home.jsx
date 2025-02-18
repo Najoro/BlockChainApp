@@ -13,10 +13,10 @@ import {
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import TabsView from "../../functions/TabsView";
-import MyWallet from "./HomeContent/MyWallet";
-import EmptyWallet from "./HomeContent/EmptyWallet";
-import SellCrypto from "./HomeContent/SellCrypto";
-import BuyCrypto from "./HomeContent/BuyCrypto";
+import MyWallet from "./MyWallet";
+import EmptyWallet from "./EmptyWallet";
+import SellCrypto from "./SellCrypto";
+import BuyCrypto from "./BuyCrypto";
 
 const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
   const navigation = useNavigation();

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import Content from "../screens/HistoryContent/Content";
+import Content from "../HistoryContent/Content";
 
 function History() {
   const [filter, setFilter] = useState("TOUT");
