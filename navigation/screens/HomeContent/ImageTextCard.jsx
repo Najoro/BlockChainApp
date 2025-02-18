@@ -11,9 +11,7 @@ const ImageTextCard = ({ imageSource, title, description,type = 'default' }) => 
         <Text style={styles.description}>{description}</Text>
       </View>
       <View>
-        {
-          type== 'historique'&& <Text>$52</Text>
-        }
+      {type== 'historique'&& <Text>$52</Text>}
       </View>
     </View>
   );
@@ -30,7 +28,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 1,
-    borderBottomWidth:0.15
   },
   image: {
     width: 60,
