@@ -110,7 +110,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#333",
     },
     filterText: {
-        color: "#000",
+        // color: "#000",
+        fontSize : 20,
     },
     factureItem: {
         flexDirection: "row",
