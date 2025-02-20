@@ -15,7 +15,7 @@ import MyWallet from "./HomeContent/MyWallet";
 import EmptyWallet from "./HomeContent/EmptyWallet";
 import SellCrypto from "./HomeContent/SellCrypto";
 import BuyCrypto from "./HomeContent/BuyCrypto";
-import ConnectWallet from "../../web3/ConnectWallet"
+import ConnectWallet from "../../Web3/ConnectWallet";
 
 // Configuration des icônes du menu
 const MENU_ITEMS = [
