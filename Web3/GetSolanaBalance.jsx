@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
 
 const GetSolanaBalance = ({ publicKey }) => {
     const [balance, setBalance] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const connection = new Connection('https://api.mainnet-beta.solana.com');
+        const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 
         const getBalance = async () => {
             try {

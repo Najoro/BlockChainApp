@@ -1,13 +1,17 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import GetSolanaBalance from './GetSolanaBalance';
+// import GetSolanaBalance from './GetSolanaBalance';
+import {Connection, PublicKey, clusterApiUrl} from "@solana/web3.js";
+
+const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+const Keypair = new PublicKey('Ao4xeDk5kS3XstEfG9C11mqt9NpvePMvH6ZDPompbMwH');
+const getBalance = await connection.getBalance(pubkey);
 
 const ConnectWallet = () => {
-  const pubkey = "Ao4xeDk5kS3XstEfG9C11mqt9NpvePMvH6ZDPompbMwH";
   return (
     <View>
-      <Text><GetSolanaBalance publicKey={pubkey} /></Text>
-      {/* <Text>asx</Text> */}
+      <Text>Solana  : {getBalance}</Text>
+
     </View>
   )
 }
