@@ -1,21 +1,32 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-// import GetSolanaBalance from './GetSolanaBalance';
-import {Connection, PublicKey, clusterApiUrl} from "@solana/web3.js";
+import {Connection,clusterApiUrl} from "@solana/web3.js";
+import GetSolanaBalance from './GetSolanaBalance';
+import GetTokenAccount from "./GetTokenAccount"
 
 const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
-const Keypair = new PublicKey('Ao4xeDk5kS3XstEfG9C11mqt9NpvePMvH6ZDPompbMwH');
-const getBalance = await connection.getBalance(pubkey);
+const pubkey = "Ao4xeDk5kS3XstEfG9C11mqt9NpvePMvH6ZDPompbMwH";
 
 const ConnectWallet = () => {
   return (
     <View>
-      <Text>Solana  : {getBalance}</Text>
-
+      <View>
+        <Text style={styles.title}>Get SOL BALANCE</Text>
+        <GetSolanaBalance connection={connection} publicKey={pubkey} />
+      </View>
+      <View>
+        <Text style={styles.title}>Liste des token Associer</Text>
+        <GetTokenAccount connection={connection} publicKey={pubkey}  />
+      </View>
     </View>
   )
 }
 
 export default ConnectWallet
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  title : {
+    fontSize : 16,
+    color : "blue",
+  }
+})
