@@ -15,6 +15,7 @@ import MyWallet from "./HomeContent/MyWallet";
 import EmptyWallet from "./HomeContent/EmptyWallet";
 import SellCrypto from "./HomeContent/SellCrypto";
 import BuyCrypto from "./HomeContent/BuyCrypto";
+import ConnectWallet from "@/Web3/ConnectWallet"
 
 // Configuration des icônes du menu
 const MENU_ITEMS = [
@@ -43,6 +44,7 @@ const Home = () => {
     <ScrollView style={styles.container}>
       <View style={[styles.headerSection, styles.soldContent]}>
         <View style={styles.header}>
+          <ConnectWallet />
           <Text style={styles.soldeText}>$27,852</Text>
         </View>        
           <FlatList

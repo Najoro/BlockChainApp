@@ -1,0 +1,4 @@
+token  : WQ7WxUXevKpKs1EgteAJgDf3tRSkciL3pM6WZgnSnU7
+account
+ : ( spl-token create-account WQ7WxUXevKpKs1EgteAJgDf3tRSkciL3pM6WZgnSnU7 )
+ : 43Kx7CJFw8Y8n87gdaBVWnPtXEK2ikMzPWwc9Wq7MDvf
