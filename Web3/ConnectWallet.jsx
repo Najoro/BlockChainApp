@@ -16,7 +16,7 @@ const ConnectWallet = () => {
     <View>
       <View>
         <Text style={styles.title}>Get SOL BALANCE</Text>
-        <GetSolanaBalance connection={connection} publicKey={pubkey} />
+        <Text><GetSolanaBalance connection={connection} publicKey={pubkey} /></Text>
       </View>
       <View>
         <Text style={styles.title}>Liste des token Associer</Text>
