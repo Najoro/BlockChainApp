@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import { Buffer } from "buffer";
+global.Buffer = global.Buffer || Buffer;
+
+
 
 const GetSolanaBalance = ({ connection, publicKey }) => {
   const [Sol, setSol] = useState(null);

@@ -11,6 +11,10 @@ import Envoyer from "@/navigation/screens/MenuContent/Envoyer";
 import Home from "@/navigation/screens/Home";
 import History  from "@/navigation/screens/History";
 import Invoice from "@/navigation/screens/Invoice";
+import { Buffer } from "buffer";
+global.Buffer = global.Buffer || Buffer;
+
+
 const Stack = createStackNavigator();
 
 export default function RootLayout() {
