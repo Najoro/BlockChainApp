@@ -19,7 +19,7 @@ const Stack = createStackNavigator();
 
 export default function RootLayout() {
   return (
-    <>
+    <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown : true}}>
           <Stack.Screen name="Login" component={Auth} />
           <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/> 
@@ -28,6 +28,6 @@ export default function RootLayout() {
           <Stack.Screen name="Echanger" component={Echanger} />
           <Stack.Screen name="Encaisser" component={Encaisser} />
         </Stack.Navigator>
-    </>
+    </ NavigationContainer>
   );
 }
