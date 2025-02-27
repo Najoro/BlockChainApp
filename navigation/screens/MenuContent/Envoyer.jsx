@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
   clusterApiUrl,
   Connection,
@@ -12,24 +14,20 @@ import {
 import {
   getOrCreateAssociatedTokenAccount,
   createTransferInstruction,
-  transfer,
   TOKEN_2022_PROGRAM_ID
 } from '@solana/spl-token';
-
-const TOKEN_PROGRAM_ID_FIXED = TOKEN_2022_PROGRAM_ID;
 
 // Connexion à la Devnet
 const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 
-// Charger la clé privée depuis ton fichier id.json
+// Charger la clé privée
 import secret from '../../../token/wallet/wallet.json';
 const senderKeypair = Keypair.fromSecretKey(new Uint8Array(secret));
 
-// Adresse du Token Mint
-const TOKEN_MINT_ADDRESS = "Fi9wM1uTCMtRHXyHkjCdQGMAyA9uwonxmrxepm3jfmXV";
+const TOKEN_PROGRAM_ID_FIXED = TOKEN_2022_PROGRAM_ID;
 
 const EnvoyerPage = () => {
-  const [tokens, setTokens] = useState([]); // Liste des tokens disponibles
+  const [tokens, setTokens] = useState([]);
   const [selectedToken, setSelectedToken] = useState(null);
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
@@ -68,7 +66,6 @@ const EnvoyerPage = () => {
       const mint = new PublicKey(selectedToken);
       const recipientPublicKey = new PublicKey(recipientAddress);
 
-      // Vérifier le compte token du sender
       const senderTokenAccount = await getOrCreateAssociatedTokenAccount(
         connection,
         senderKeypair,
@@ -76,7 +73,6 @@ const EnvoyerPage = () => {
         senderKeypair.publicKey
       );
 
-      // Vérifier ou créer le compte token du destinataire
       const recipientTokenAccount = await getOrCreateAssociatedTokenAccount(
         connection,
         senderKeypair,
@@ -87,11 +83,9 @@ const EnvoyerPage = () => {
         TOKEN_PROGRAM_ID_FIXED
       );
 
-      // Convertir en plus petite unité
       const decimals = 9;
       const amountInSmallestUnit = parseInt(amount) * 10 ** decimals;
 
-      // Créer la transaction
       const transaction = new Transaction().add(
         createTransferInstruction(
           senderTokenAccount.address,
@@ -103,14 +97,10 @@ const EnvoyerPage = () => {
         )
       );
 
-      
-
-      // Ajouter blockhash et fee payer
       const { blockhash } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = senderKeypair.publicKey;
 
-      // Envoyer la transaction
       const signature = await sendAndConfirmTransaction(connection, transaction, [senderKeypair]);
 
       Alert.alert('Succès', `Transaction confirmée !\nSignature : ${signature}`);
@@ -123,38 +113,48 @@ const EnvoyerPage = () => {
 
   return (
     <View style={styles.container}>
+      <Ionicons name="send-outline" size={60} color="#007AFF" />
       <Text style={styles.title}>Envoyer des Tokens</Text>
 
       <View style={styles.formContainer}>
         <Text style={styles.label}>Sélectionner un Token</Text>
-          <Picker
-            selectedValue={selectedToken}
-            onValueChange={(itemValue) => setSelectedToken(itemValue)}
-            style={styles.picker}
-          >
-            {tokens.map((token, index) => (
-              <Picker.Item key={index} label={token.mintAddress} value={token.mintAddress} />
-            ))}
-          </Picker>
-        
+        <Picker
+          selectedValue={selectedToken}
+          onValueChange={(itemValue) => setSelectedToken(itemValue)}
+          style={styles.picker}
+        >
+          {tokens.map((token, index) => (
+            <Picker.Item key={index} label={token.mintAddress} value={token.mintAddress} />
+          ))}
+        </Picker>
+
         <Text style={styles.label}>Adresse du destinataire</Text>
         <TextInput
-          style={styles.input}
+          mode="outlined"
           placeholder="Entrez l'adresse du wallet"
           value={recipientAddress}
           onChangeText={setRecipientAddress}
+          style={styles.input}
         />
 
         <Text style={styles.label}>Montant</Text>
         <TextInput
-          style={styles.input}
+          mode="outlined"
           placeholder="Entrez le montant"
           keyboardType="numeric"
           value={amount}
           onChangeText={setAmount}
+          style={styles.input}
         />
 
-        <Button title="Envoyer" onPress={sendToken} />
+        <Button
+          mode="contained"
+          onPress={sendToken}
+          style={styles.button}
+          labelStyle={styles.buttonText}
+        >
+          Envoyer
+        </Button>
       </View>
     </View>
   );
@@ -164,6 +164,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
     backgroundColor: '#f8f9fa',
   },
@@ -171,9 +172,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
+    color: '#333',
   },
   formContainer: {
+    width: '100%',
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
@@ -186,14 +189,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 8,
+    color: '#333',
+  },
+  picker: {
+    height: 50,
+    marginBottom: 20,
   },
   input: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 5,
     marginBottom: 20,
-    paddingHorizontal: 10,
+  },
+  button: {
+    borderRadius: 8,
+    paddingVertical: 8,
+    marginTop: 10,
+  },
+  buttonText: {
     fontSize: 16,
   },
 });

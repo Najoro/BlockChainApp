@@ -1,58 +1,67 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { View, ScrollView, StyleSheet } from "react-native";
+import { Text, Button, Card, TextInput } from "react-native-paper";
+import { Feather } from "@expo/vector-icons";
 import Content from "../screens/HistoryContent/Content";
 
 function History() {
   const [filter, setFilter] = useState("TOUT");
-  
+
   return (
     <ScrollView style={styles.container}>
-      {/* En-tête avec titre et filtre */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Historique</Text>
-        <View style={styles.filterContainer}>
-          {["TOUT", "BTC", "ETH", "LTC"].map((currency) => (
-            <TouchableOpacity
-              key={currency}
-              style={[styles.filterButton, filter === currency && styles.activeFilterButton]}
-              onPress={() => setFilter(currency)}
-            >
-              <Text style={[styles.filterText, filter === currency && styles.activeFilterText]}>
+      {/* 🔹 En-tête avec titre et filtres */}
+      <Card style={styles.header}>
+        <Card.Content>
+          <Text style={styles.headerText}>Historique</Text>
+          <View style={styles.filterContainer}>
+            {["TOUT", "BTC", "ETH", "LTC"].map((currency) => (
+              <Button
+                key={currency}
+                mode={filter === currency ? "contained" : "outlined"}
+                onPress={() => setFilter(currency)}
+                style={styles.filterButton}
+                labelStyle={styles.filterText}
+              >
                 {currency}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-      
-      {/* Résumé des transactions */}
-      <View style={styles.transactionSummary}>
-        <View style={styles.transactionItem}>
-          <Feather name="arrow-up-right" size={20} color="#3674B5" />
-          <View>
-            <Text style={styles.totalLabel}>Envoyé</Text>
-            <Text style={styles.totalValue}>$1,250</Text>
+              </Button>
+            ))}
           </View>
-        </View>
-        <View style={styles.transactionItem}>
-          <Feather name="arrow-down-left" size={20} color="#3674B5" />
-          <View>
-            <Text style={styles.totalLabel}>Reçu</Text>
-            <Text style={styles.totalValue}>$500</Text>
+        </Card.Content>
+      </Card>
+
+      {/* 🔹 Résumé des transactions */}
+      <Card style={styles.transactionSummary}>
+        <Card.Content>
+          <View style={styles.transactionRow}>
+            <View style={styles.transactionItem}>
+              <Feather name="arrow-up-right" size={20} color="#3674B5" />
+              <View>
+                <Text style={styles.totalLabel}>Envoyé</Text>
+                <Text style={styles.totalValue}>$1,250</Text>
+              </View>
+            </View>
+            <View style={styles.transactionItem}>
+              <Feather name="arrow-down-left" size={20} color="#3674B5" />
+              <View>
+                <Text style={styles.totalLabel}>Reçu</Text>
+                <Text style={styles.totalValue}>$500</Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      
-      {/* Barre de recherche */}
+        </Card.Content>
+      </Card>
+
+      {/* 🔹 Barre de recherche */}
       <View style={styles.searchContainer}>
-        <TextInput placeholder="Exporter l'historique" style={styles.searchInput} />
-        <TouchableOpacity style={styles.searchButton}>
-          <Feather name="search" size={20} color="#3674B5" />
-        </TouchableOpacity>
+        <TextInput
+          mode="outlined"
+          label="Exporter l'historique"
+          style={styles.searchInput}
+          right={<TextInput.Icon name="magnify" />}
+        />
       </View>
-      
-      {/* Contenu de l'historique */}
+
+      {/* 🔹 Contenu de l'historique */}
       <View style={styles.content}>
         <Content date="Aujourd'hui, 10 Février" />
         <Content date="15 Février" />
@@ -63,55 +72,49 @@ function History() {
 
 export default History;
 
+// 🎨 Styles
 const styles = StyleSheet.create({
   container: {
-    maxheight:'100%',
     flex: 1,
     backgroundColor: "#F5F5F5",
-    overflow: 'hidden',
+    padding: 10,
   },
   header: {
-    backgroundColor: "#0000FF",
-    height: "26%",
-    padding: 20,
+    backgroundColor: "#3674B5",
+    borderRadius: 15,
+    paddingVertical: 20,
+    marginBottom: 15,
     alignItems: "center",
-    justifyContent:'space-around'
   },
   headerText: {
     color: "white",
     fontSize: 25,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
   },
   filterContainer: {
     flexDirection: "row",
-    marginBottom: 40
+    justifyContent: "center",
   },
   filterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-  },
-  activeFilterButton: {
+    marginHorizontal: 5,
   },
   filterText: {
-    color: "#D3D3D3",
-    fontSize: 16,
-  },
-  activeFilterText: {
-    color: "white",
+    fontSize: 14,
   },
   transactionSummary: {
-    marginTop: -60,
-    backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    padding: 20,
-    margin: 15,
-    borderRadius: 10,
+    borderRadius: 15,
+    marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 3,
+  },
+  transactionRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   transactionItem: {
     flexDirection: "row",
@@ -128,29 +131,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "white",
-    marginBottom: 5,
-    marginHorizontal: 15,
-    paddingHorizontal: 15,
-    borderRadius: 25,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 1,
+    marginBottom: 10,
   },
   searchInput: {
-    flex: 1,
-    height: 40,
+    backgroundColor: "#fff",
     fontSize: 16,
-    color: "#000",
   },
-  searchButton: {
-    padding: 10,
+  content: {
+    marginBottom: 80,
   },
-  content:{
-    marginBottom:80
-  }
 });
