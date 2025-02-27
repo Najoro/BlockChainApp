@@ -1,15 +1,8 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import {
-  Text,
-  View,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
-import Feather from "@expo/vector-icons/Feather";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { View, ScrollView, StyleSheet, FlatList } from "react-native";
+import { Text, Card, Button } from "react-native-paper";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import TabsView from "@/components/functions/TabsView";
 import MyWallet from "./HomeContent/MyWallet";
 import EmptyWallet from "./HomeContent/EmptyWallet";
@@ -29,12 +22,15 @@ const MENU_ITEMS = [
 const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
   const navigation = useNavigation();
   return (
-    <TouchableOpacity onPress={() => navigation.navigate(screen)} style={styles.menuItem}>
-      <View style={styles.icone}>
-        <IconLibrary name={iconName} size={30} color="white" />
-      </View>
-      <Text style={styles.text}>{label}</Text>
-    </TouchableOpacity>
+    <Button
+      mode="contained"
+      icon={({ size, color }) => <IconLibrary name={iconName} size={size} color={color} />}
+      onPress={() => navigation.navigate(screen)}
+      style={styles.menuButton}
+      labelStyle={styles.menuLabel}
+    >
+      {label}
+    </Button>
   );
 };
 
@@ -42,49 +38,59 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
 const Home = () => {
   return (
     <ScrollView style={styles.container}>
-      <View style={[styles.headerSection, styles.soldContent]}>
-        <View style={styles.header}>
-          <Text style={styles.soldeText}>$27,852</Text>
-        </View>        
+      {/* 🔹 Solde total */}
+      <Card style={styles.balanceCard}>
+        <Card.Content style={styles.balanceContent}>
+          <Text style={styles.balanceText}>$27,852</Text>
           <FlatList
             data={MENU_ITEMS}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <MenuIcon {...item} />}
             horizontal
-            contentContainerStyle={styles.menu}
+            contentContainerStyle={styles.menuContainer}
             showsHorizontalScrollIndicator={false}
           />
-      </View>
-      <View style={[styles.content, styles.walletContent]}>
-        <ConnectWallet />
-      </View>
+        </Card.Content>
+      </Card>
 
-      <View style={[styles.content, styles.walletContent]}>
-        <TabsView
-          routes={[
-            { key: "first", title: "Mon Portefeuille" },
-            { key: "second", title: "Portefeuilles vides" },
-          ]}
-          sceneMap={{
-            first: MyWallet,
-            second: EmptyWallet,
-          }}
-        />
-      </View>
+      {/* 🔹 Connexion au Wallet */}
+      <Card style={styles.sectionCard}>
+        <Card.Content>
+          <ConnectWallet />
+        </Card.Content>
+      </Card>
 
-      {/* 🔹 Tabs : Achat/Vente Crypto */}
-      <View style={[styles.content, styles.walletContent]}>
-        <TabsView
-          routes={[
-            { key: "first", title: "Acheter des cryptos" },
-            { key: "second", title: "Vendre des cryptos" },
-          ]}
-          sceneMap={{
-            first: BuyCrypto,
-            second: SellCrypto,
-          }}
-        />
-      </View>
+      {/* 🔹 Portefeuille */}
+      <Card style={styles.sectionCard}>
+        <Card.Content>
+          <TabsView
+            routes={[
+              { key: "first", title: "Mon Portefeuille" },
+              { key: "second", title: "Portefeuilles vides" },
+            ]}
+            sceneMap={{
+              first: MyWallet,
+              second: EmptyWallet,
+            }}
+          />
+        </Card.Content>
+      </Card>
+
+      {/* 🔹 Achat/Vente Crypto */}
+      <Card style={styles.sectionCard}>
+        <Card.Content>
+          <TabsView
+            routes={[
+              { key: "first", title: "Acheter des cryptos" },
+              { key: "second", title: "Vendre des cryptos" },
+            ]}
+            sceneMap={{
+              first: BuyCrypto,
+              second: SellCrypto,
+            }}
+          />
+        </Card.Content>
+      </Card>
     </ScrollView>
   );
 };
@@ -93,55 +99,46 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f8f9fa",
+    padding: 10,
   },
-  headerSection: {
-    height: "35%",
-    alignItems : "center",
-    justifyContent : "center",
+  balanceCard: {
+    backgroundColor: "#3674B5",
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 20,
   },
-  soldContent: {
-    backgroundColor: "#0000FF",
-    justifyContent: "space-around",
-    paddingTop: 40,
-  },
-  header: {
-    justifyContent: "center",
+  balanceContent: {
     alignItems: "center",
   },
-  soldeText: {
-    fontSize: 50,
-    fontWeight : "600",
+  balanceText: {
+    fontSize: 45,
+    fontWeight: "bold",
     color: "#fff",
+    marginBottom: 15,
   },
-  menu: {
-    marginTop: -25,
-    paddingHorizontal: 10,
-  },
-  text: {
-    color: "white",
-    fontSize: 15,
-    marginTop: 5,
-    textAlign: "center",
-  },
-  menuItem: {
+  menuContainer: {
+    flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 10,
   },
-  icone: {
-    backgroundColor: "#578FCA",
-    width: 65,
-    height: 65,
-    borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
+  menuButton: {
+    backgroundColor: "#0056b3",
+    marginHorizontal: 5,
+    borderRadius: 10,
   },
-  content: {
-    minHeight: 300,
+  menuLabel: {
+    fontSize: 12,
   },
-  walletContent: {
+  sectionCard: {
     backgroundColor: "#fff",
-    marginTop: 5,
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
 });
 
