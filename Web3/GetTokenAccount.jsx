@@ -3,6 +3,7 @@ import { StyleSheet, Text, View,FlatList } from 'react-native';
 import { AccountLayout, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { Buffer } from "buffer";
+import ImageTextCard from '@/navigation/screens/HomeContent/ImageTextCard';
 global.Buffer = Buffer;
 
 
@@ -33,15 +34,22 @@ const GetTokenAccount = ({ connection, publicKey }) => {
   }, [publicKey,connection]);
 
   return (
-    <View style={styles.container}>
+    <View>
       {tokens.length === 0 ? (
         <Text style={styles.loading}>Chargement...</Text>
       ) : (
         tokens.map((token, index) => (
-          <View key={index} style={styles.tokenItem}>
-            <Text style={styles.mint}>{token.mintAddress}</Text>
-            <Text style={styles.amount}> {token.amount}</Text>
-          </View>
+          <ImageTextCard
+          imageSource={{
+            uri: "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafkreidbtcki227qnikxjnj4jz6i34eso6vml6xtaquvdtszi23purydt4",
+          }}
+          title="Nom token"
+          description={token.amount}
+        />
+          // <View key={index} style={styles.tokenItem}>
+          //   <Text style={styles.mint}>{token.mintAddress}</Text>
+          //   <Text style={styles.amount}> {token.amount}</Text>
+          // </View>
         ))
       )}
     </View>
@@ -56,7 +64,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   tokenItem: {
-    padding: 10,
     marginBottom: 10,
     backgroundColor: '#ffffff',
     borderRadius: 8,

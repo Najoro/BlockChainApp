@@ -60,37 +60,6 @@ const Home = () => {
         </Card.Content>
       </Card>
 
-      {/* 🔹 Portefeuille */}
-      <Card style={styles.sectionCard}>
-        <Card.Content>
-          <TabsView
-            routes={[
-              { key: "first", title: "Mon Portefeuille" },
-              { key: "second", title: "Portefeuilles vides" },
-            ]}
-            sceneMap={{
-              first: MyWallet,
-              second: EmptyWallet,
-            }}
-          />
-        </Card.Content>
-      </Card>
-
-      {/* 🔹 Achat/Vente Crypto */}
-      <Card style={styles.sectionCard}>
-        <Card.Content>
-          <TabsView
-            routes={[
-              { key: "first", title: "Acheter des cryptos" },
-              { key: "second", title: "Vendre des cryptos" },
-            ]}
-            sceneMap={{
-              first: BuyCrypto,
-              second: SellCrypto,
-            }}
-          />
-        </Card.Content>
-      </Card>
     </ScrollView>
   );
 };

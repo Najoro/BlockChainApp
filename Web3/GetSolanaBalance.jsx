@@ -29,7 +29,7 @@ const GetSolanaBalance = ({ connection, publicKey }) => {
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <Text style={styles.solText}>
-          Solde: {Sol !== null ? `${Sol} SOL` : "Chargement..."}
+          Solana Balance : {Sol !== null ? `${Math.ceil(Sol)} SOL` : "Chargement..."}
         </Text>
       )}
     </View>
@@ -39,11 +39,14 @@ const GetSolanaBalance = ({ connection, publicKey }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    backgroundColor : "#3674B5",
     alignItems: "center",
   },
   solText: {
     fontSize: 18,
     fontWeight: "bold",
+    color :'white',
+
   },
   errorText: {
     color: "red",
