@@ -22,8 +22,9 @@ import {
 const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 
 // Charger la clé privée
-import secret from '../../../token/wallet/wallet.json';
-const senderKeypair = Keypair.fromSecretKey(new Uint8Array(secret));
+// import secret from '../../../token/wallet/id.json';
+import {SOLANA_WALLET_PRIVATE_KEY} from "@/app.config";
+const senderKeypair = Keypair.fromSecretKey(new Uint8Array(SOLANA_WALLET_PRIVATE_KEY));
 
 const TOKEN_PROGRAM_ID_FIXED = TOKEN_2022_PROGRAM_ID;
 

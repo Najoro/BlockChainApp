@@ -39,17 +39,15 @@ const GetTokenAccount = ({ connection, publicKey }) => {
         <Text style={styles.loading}>Chargement...</Text>
       ) : (
         tokens.map((token, index) => (
-          <ImageTextCard
-          imageSource={{
-            uri: "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafkreidbtcki227qnikxjnj4jz6i34eso6vml6xtaquvdtszi23purydt4",
-          }}
-          title="Nom token"
-          description={token.amount}
-        />
-          // <View key={index} style={styles.tokenItem}>
-          //   <Text style={styles.mint}>{token.mintAddress}</Text>
-          //   <Text style={styles.amount}> {token.amount}</Text>
-          // </View>
+          <View key={index}>
+            <ImageTextCard
+              imageSource={{
+                uri: "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafkreidbtcki227qnikxjnj4jz6i34eso6vml6xtaquvdtszi23purydt4",
+              }}
+              title="Nom token"
+              description={token.amount}
+            />
+          </View>
         ))
       )}
     </View>

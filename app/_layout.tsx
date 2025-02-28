@@ -29,8 +29,8 @@ export default function RootLayout() {
           <Stack.Screen name="ImportPrivateKey" component={ImportPrivateKey} />
           <Stack.Screen name="walletLogin" component={walletLogin} />
           <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/> 
-          <Stack.Screen name="Recevoir" component={Recevoir} />
-          <Stack.Screen name="Envoyer" component={Envoyer} />
+          <Stack.Screen name="Recevoir" component={Recevoir}  />
+          <Stack.Screen name="Envoyer" component={Envoyer} options={{headerShown: true,}}/>
           <Stack.Screen name="Echanger" component={Echanger} />
           <Stack.Screen name="Encaisser" component={Encaisser} />
         </Stack.Navigator>
