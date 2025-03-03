@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert,ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,22 +55,43 @@ const createToken2022ATA = async (connection, payer, mint, owner) => {
   return ata;
 };
 
-const EnvoyerPage = (props) => {
-  const { route } = props; 
-  const token = route?.params?.token;
-  const [recipientAddress, setRecipientAddress] = useState('AsYnzcgUhdLC9R9W65ayXWAKZ2f7zPtPa4qkdB5jXtHX');
+const EnvoyerPage = () => {
+  const [tokens, setTokens] = useState([]);
+  const [selectedToken, setSelectedToken] = useState(null);
+  const [recipientAddress, setRecipientAddress] = useState('GwQQvj2wT1JrzsNfxZGEeyewz9xJEiUJ3hsEAPJpbVqC');
   const [amount, setAmount] = useState('');
-  const [loading, setLoading] = useState(false);
-  
+
+  useEffect(() => {
+    fetchUserTokens();
+  }, []);
+
+  const fetchUserTokens = async () => {
+    try {
+      const tokenAccounts = await connection.getTokenAccountsByOwner(
+        senderKeypair.publicKey,
+        { programId: TOKEN_PROGRAM_ID_FIXED }
+      );
+
+      const tokenList = tokenAccounts.value.map((tokenAccount) => {
+        const mintAddress = new PublicKey(tokenAccount.account.data.slice(0, 32)).toBase58();
+        return { mintAddress };
+      });
+
+      setTokens(tokenList);
+      if (tokenList.length > 0) setSelectedToken(tokenList[0].mintAddress);
+    } catch (error) {
+      Alert.alert('Erreur', 'Impossible de récupérer les tokens.');
+    }
+  };
+
   const sendToken = async () => {
     try {
-      if (!token || !recipientAddress || !amount) {
+      if (!selectedToken || !recipientAddress || !amount) {
         Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
         return;
       }
-      setLoading(true);
 
-      const mint = new PublicKey(token);
+      const mint = new PublicKey(selectedToken);
       const recipientPublicKey = new PublicKey(recipientAddress);
 
       const senderTokenAccount = await createToken2022ATA(
@@ -106,32 +127,34 @@ const EnvoyerPage = (props) => {
       transaction.feePayer = senderKeypair.publicKey;
 
       const signature = await sendAndConfirmTransaction(connection, transaction, [senderKeypair]);
-      if(signature){
-        setLoading(false);
-      }
-      Alert.alert('Succès', `Transaction confirmée !\nSignature : ${signature}`);
 
+      Alert.alert('Succès', `Transaction confirmée !\nSignature : ${signature}`);
     } catch (error) {
-      setLoading(false);
       Alert.alert('Erreur', `La transaction a échoué.\n${error}`);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <Ionicons name="send-outline" size={60} color="#007AFF" />
       <Text style={styles.title}>Envoyer des Tokens</Text>
-      <Text>{token}</Text>
+
       <View style={styles.formContainer}>
+        <Text style={styles.label}>Sélectionner un Token</Text>
+        <Picker selectedValue={selectedToken} onValueChange={setSelectedToken} style={styles.picker}>
+          {tokens.map((token, index) => (
+            <Picker.Item key={index} label={token.mintAddress} value={token.mintAddress} />
+          ))}
+        </Picker>
 
         <Text style={styles.label}>Adresse du destinataire</Text>
         <TextInput mode="outlined" placeholder="Entrez l'adresse du wallet" value={recipientAddress} onChangeText={setRecipientAddress} style={styles.input} />
+       
 
         <Text style={styles.label}>Montant</Text>
         <TextInput mode="outlined" placeholder="Entrez le montant" keyboardType="numeric" value={amount} onChangeText={setAmount} style={styles.input} />
-          {!loading 
-          ? (<Button mode="contained" onPress={sendToken} style={styles.button} labelStyle={styles.buttonText}>Envoyer</Button>) 
-          : (<ActivityIndicator size="large" color="#007bff" />)}
+
+        <Button mode="contained" onPress={sendToken} style={styles.button} labelStyle={styles.buttonText}>Envoyer</Button>
       </View>
     </View>
   );

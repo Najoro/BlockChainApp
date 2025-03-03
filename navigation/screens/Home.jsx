@@ -13,7 +13,7 @@ import ConnectWallet from "../../Web3/ConnectWallet";
 // Configuration des icônes du menu
 const MENU_ITEMS = [
   { id: "1", iconLibrary: Feather, iconName: "arrow-down-left", label: "Recevoir", screen: "Recevoir" },
-  { id: "2", iconLibrary: Feather, iconName: "arrow-up-right", label: "Envoyer", screen: "Envoyer" },
+  { id: "2", iconLibrary: Feather, iconName: "arrow-up-right", label: "Envoyer", screen: "tokensList" },
   { id: "3", iconLibrary: Feather, iconName: "refresh-cw", label: "Échanger", screen: "Echanger" },
   { id: "4", iconLibrary: FontAwesome, iconName: "money", label: "Encaisser", screen: "Encaisser" },
 ];

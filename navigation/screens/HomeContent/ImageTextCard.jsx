@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     justifyContent:'space-evenly',
   },
   title: {
-    fontSize: 18,
+    fontSize: 10,
     fontWeight: "bold",
     color: "#333",
   },

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View,FlatList } from 'react-native';
+import { StyleSheet, Text, View,FlatList,TouchableOpacity,ActivityIndicator  } from 'react-native';
 import { AccountLayout, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { Buffer } from "buffer";
 import ImageTextCard from '@/navigation/screens/HomeContent/ImageTextCard';
+import { useNavigation } from "@react-navigation/native";
+
 global.Buffer = Buffer;
 
 
 const GetTokenAccount = ({ connection, publicKey }) => {
+  const navigation = useNavigation();
   const [tokens, setTokens] = useState([]);
   const [error , setError] = useState(null);
 
@@ -19,7 +22,7 @@ const GetTokenAccount = ({ connection, publicKey }) => {
         const tokenList = tokenAccounts.value.map((tokenAccount) => {
           const accountData = AccountLayout.decode(tokenAccount.account.data);
           const mintAddress = new PublicKey(accountData.mint).toBase58();
-          const amount = accountData.amount.toString();
+          const amount = parseInt(accountData.amount) / 10 ** 9;
           return { mintAddress, amount };
         });
 
@@ -33,21 +36,22 @@ const GetTokenAccount = ({ connection, publicKey }) => {
     })();
   }, [publicKey,connection]);
 
+  
   return (
     <View>
       {tokens.length === 0 ? (
-        <Text style={styles.loading}>Chargement...</Text>
+        <ActivityIndicator size="large" color="#007bff" />
       ) : (
         tokens.map((token, index) => (
-          <View key={index}>
+          <TouchableOpacity  key={index} onPress={() => {navigation.navigate("Envoyer", {token: token.mintAddress})}}>
             <ImageTextCard
               imageSource={{
                 uri: "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafkreidbtcki227qnikxjnj4jz6i34eso6vml6xtaquvdtszi23purydt4",
               }}
-              title="Nom token"
+              title={token.mintAddress}
               description={token.amount}
             />
-          </View>
+          </TouchableOpacity>
         ))
       )}
     </View>
