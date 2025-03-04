@@ -14,12 +14,9 @@ global.Buffer = Buffer;
 const connection = new Connection(SOLANA_RPC_URL);
 const pubkey = SOLANA_WALLET_PUBLIC_KEY;
 
-const ConnectWallet = () => {
+const TokensList = () => {
   return (
     <View>
-      <View style={styles.solanaBalance}>
-        <Text><GetSolanaBalance connection={connection} publicKey={pubkey} /></Text>
-      </View>
       <View>
         <Text style={styles.title}>Token associé</Text>
         <GetTokenAccount connection={connection} publicKey={pubkey}  />
@@ -28,7 +25,7 @@ const ConnectWallet = () => {
   )
 }
 
-export default ConnectWallet
+export default TokensList;
 
 const styles = StyleSheet.create({
   solanaBalance : {

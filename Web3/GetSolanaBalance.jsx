@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet,ActivityIndicator } from "react-native";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { Buffer } from "buffer";
 global.Buffer = global.Buffer || Buffer;
@@ -29,7 +29,7 @@ const GetSolanaBalance = ({ connection, publicKey }) => {
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <Text style={styles.solText}>
-          Solde: {Sol !== null ? `${Sol} SOL` : "Chargement..."}
+          Solana Balance : {Sol !== null ? `${Math.ceil(Sol)} SOL` : (<ActivityIndicator size="large" color="white" />)}
         </Text>
       )}
     </View>
@@ -39,11 +39,14 @@ const GetSolanaBalance = ({ connection, publicKey }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    backgroundColor : "#3674B5",
     alignItems: "center",
   },
   solText: {
     fontSize: 18,
     fontWeight: "bold",
+    color :'white',
+
   },
   errorText: {
     color: "red",

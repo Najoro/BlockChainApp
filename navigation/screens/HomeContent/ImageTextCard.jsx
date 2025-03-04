@@ -28,10 +28,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 1,
+    marginTop: 12,
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 30, 
     marginRight: 10,
   },
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     justifyContent:'space-evenly',
   },
   title: {
-    fontSize: 25,
+    fontSize: 10,
     fontWeight: "bold",
     color: "#333",
   },
