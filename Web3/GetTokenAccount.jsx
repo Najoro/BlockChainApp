@@ -2,12 +2,44 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View,FlatList,TouchableOpacity,ActivityIndicator  } from 'react-native';
 import { AccountLayout, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
-import { Buffer } from "buffer";
 import ImageTextCard from '@/navigation/screens/HomeContent/ImageTextCard';
 import { useNavigation } from "@react-navigation/native";
+import {Metadata} from "@metaplex-foundation/mpl-token-metadata";
 
+import { Buffer } from "buffer";
 global.Buffer = Buffer;
 
+// Fonction pour récupérer les métadonnées d'un token à partir de son mint address
+const getTokenMetadata = async (mintAddress, connection) => {
+  try {
+    const metadataPDA = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("metadata"),
+        Metadata.programId.toBuffer(),
+        new PublicKey(mintAddress).toBuffer(),
+      ],
+      Metadata.programId
+    );
+    // const metadataPDA = await Metadata.getPDA(mintAddress);
+
+    console.log("metadataPDA");
+    
+    const accountInfo = await connection.getAccountInfo(metadataPDA);
+    
+    if (!accountInfo) return null;
+
+    const metadata = Metadata.deserialize(accountInfo.data)[0];
+    const metadataUri = metadata.data.uri;
+
+    // Récupérer les données JSON depuis l'URI
+    const response = await fetch(metadataUri);
+    return await response.json();
+
+  } catch (err) {
+    console.error("Erreur récupération metadata :", err);
+    return null;
+  }
+};
 
 const GetTokenAccount = ({ connection, publicKey }) => {
   const navigation = useNavigation();
@@ -19,12 +51,24 @@ const GetTokenAccount = ({ connection, publicKey }) => {
       try {
         const tokenAccounts = await connection.getTokenAccountsByOwner(new PublicKey(publicKey), {programId: TOKEN_2022_PROGRAM_ID, });
         
-        const tokenList = tokenAccounts.value.map((tokenAccount) => {
-          const accountData = AccountLayout.decode(tokenAccount.account.data);
-          const mintAddress = new PublicKey(accountData.mint).toBase58();
-          const amount = parseInt(accountData.amount) / 10 ** 9;
-          return { mintAddress, amount };
-        });
+        const tokenList = await Promise.all(
+          tokenAccounts.value.map(async (tokenAccount) => {
+            const accountData = AccountLayout.decode(tokenAccount.account.data);
+            const mintAddress = new PublicKey(accountData.mint).toBase58();
+            const amount = parseInt(accountData.amount) / 10 ** 9;
+            
+            // Récupérer les métadonnées du token
+            const metadata = await getTokenMetadata(mintAddress, connection);
+            
+            return { 
+              mintAddress, 
+              amount,
+              name: metadata?.name || "Ariary",
+              symbol: metadata?.symbol || "Ar",
+              image: metadata?.image || "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafybeih7laba3limk6h6qq2u7gky4xcmqqvfbyx6atq2uillvxil2azaxy",
+            };
+          })
+        );
 
         setTokens(tokenList);
 
@@ -36,6 +80,8 @@ const GetTokenAccount = ({ connection, publicKey }) => {
     })();
   }, [publicKey,connection]);
 
+  // console.log(tokens);
+  
   
   return (
     <View>
@@ -46,9 +92,9 @@ const GetTokenAccount = ({ connection, publicKey }) => {
           <TouchableOpacity  key={index} onPress={() => {navigation.navigate("Envoyer", {token: token.mintAddress})}}>
             <ImageTextCard
               imageSource={{
-                uri: "https://red-leading-marmot-607.mypinata.cloud/ipfs/bafkreidbtcki227qnikxjnj4jz6i34eso6vml6xtaquvdtszi23purydt4",
+                uri: token.image,
               }}
-              title={token.mintAddress}
+              title={token.name}
               description={token.amount}
             />
           </TouchableOpacity>
