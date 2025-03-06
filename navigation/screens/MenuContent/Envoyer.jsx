@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert,ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Alert,ActivityIndicator,TouchableOpacity } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +24,7 @@ const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 // Charger la clé privée
 // import secret from '../../../token/wallet/id.json';
 import {SOLANA_WALLET_PRIVATE_KEY} from "@/app.config";
+import { useNavigation } from '@react-navigation/native';
 const senderKeypair = Keypair.fromSecretKey(new Uint8Array(SOLANA_WALLET_PRIVATE_KEY));
 
 const TOKEN_PROGRAM_ID_FIXED = TOKEN_2022_PROGRAM_ID;
@@ -58,10 +59,12 @@ const createToken2022ATA = async (connection, payer, mint, owner) => {
 const EnvoyerPage = (props) => {
   const { route } = props; 
   const token = route?.params?.token;
-  const [recipientAddress, setRecipientAddress] = useState('AsYnzcgUhdLC9R9W65ayXWAKZ2f7zPtPa4qkdB5jXtHX');
+  const addressScan = route?.params?.address || null;
+  const [recipientAddress, setRecipientAddress] = useState(addressScan);
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const navigation = useNavigation();
+ 
   const sendToken = async () => {
     try {
       if (!token || !recipientAddress || !amount) {
@@ -116,15 +119,22 @@ const EnvoyerPage = (props) => {
       Alert.alert('Erreur', `La transaction a échoué.\n${error}`);
     }
   };
-  
+  const handleScan = () => {
+    navigation.navigate('ScanCodeQr', {token : token})
+  }
+
   return (
     <View style={styles.container}>
       <Ionicons name="send-outline" size={60} color="#007AFF" />
       <Text style={styles.title}>Envoyer des Tokens</Text>
       <Text>{token}</Text>
       <View style={styles.formContainer}>
-
-        <Text style={styles.label}>Adresse du destinataire</Text>
+        <View style = {styles.scanContenaire}>
+          <Text style={styles.label}>Adresse du destinataire</Text>
+          <TouchableOpacity onPress={handleScan}>
+            <Ionicons name="scan" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
         <TextInput mode="outlined" placeholder="Entrez l'adresse du wallet" value={recipientAddress} onChangeText={setRecipientAddress} style={styles.input} />
 
         <Text style={styles.label}>Montant</Text>
@@ -138,6 +148,7 @@ const EnvoyerPage = (props) => {
 };
 
 const styles = StyleSheet.create({
+  scanContenaire : {display: "flex", flexDirection:'row' , alignItems: "center", gap: 20, marginBottom: 10},
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#f8f9fa' },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 20, color: '#333' },
   formContainer: { width: '100%', backgroundColor: 'white', padding: 20, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 5, elevation: 3 },
