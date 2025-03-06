@@ -1,133 +1,296 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useCallback } from "react";
+import keyPair from "@/token/wallet/id.json";
+import {
+  View,
+  ActivityIndicator,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
+import { Button } from "react-native-paper";
 
-const Invoice = () => {
-    const [searchText, setSearchText] = useState("");
-    const [filter, setFilter] = useState("all");
+const FactureScreen = () => {
+  const [refClient, setRefClient] = useState("23524780190");
+  const [refFacture, setRefFacture] = useState("235210721196922");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [idPaiement, setIdPaiement] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [montantTotal, setMontantTotal] = useState(0);
+  const [transactionModalVisible, setTransactionModalVisible] = useState(false);
+  const [factureData, setFactureData] = useState({
+    clientName: "",
+    addressClient: "",
+    montantFacture: "",
+  });
 
-    // Liste des factures avec des statuts différents
-    const factures = [
-        { id: "1", client: "Jean Dupont", montant: "150 €", statut: "payé" },
-        { id: "2", client: "Marie Curie", montant: "200 €", statut: "non payé" },
-        { id: "5", client: "Nikola Tesla", montant: "300 €", statut: "payé" },
-        { id: "7", client: "Nikola Tesla", montant: "300 €", statut: "payé" },
-        { id: "8", client: "Nikola Tesla", montant: "300 €", statut: "non payé"},
-        { id: "9", client: "Nikola Tesla", montant: "300 €", statut: "payé" },
-        { id: "10", client: "Nikola Tesla", montant: "300 €", statut: "non payé" },
-        { id: "11", client: "Nikola Tesla", montant: "300 €", statut: "payé" },
-        { id: "12", client: "Nikola Tesla", montant: "300 €", statut: "non payé" },
-        { id: "14", client: "Nikola Tesla", montant: "300 €", statut: "payé" },
-    ];
+  // Fonction pour récupérer les données de la facture et du client
+  const fetchFactureData = async () => {
+    setLoading(true);
+    try {
+      const [factureResponse, clientResponse] = await Promise.all([
+        fetch(
+          `https://preprod.api.cashless.eqima.org/jiramacontroller/montantFacture2?referencefacture=${refFacture}`
+        ),
+        fetch(
+          `https://preprod.api.cashless.eqima.org/jiramacontroller/infoClient?referencefacture=${refFacture}&referenceclient=${refClient}`
+        ),
+      ]);
 
-    // Couleurs en fonction du statut
-    const statusColors = {
-        "payé": "blue",
-        "non payé": "red",
-    };
+      const dataFacture = await factureResponse.json();
+      const dataClient = await clientResponse.json();
 
-    // Filtrer les factures selon le texte et le statut
-    const facturesFiltrées = factures.filter(facture =>
-        facture.client.toLowerCase().includes(searchText.toLowerCase()) &&
-        (filter === "all" || facture.statut === filter)
-    );
+      setFactureData({
+        montantFacture:
+          dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.55TRINVA_SUM"] || "N/A",
+        clientName:
+          dataClient?.fs_DATABROWSE_V55WS1A?.data?.gridData?.rowset?.[0]
+            ?.F0101_ALPH || "Nom inconnu",
+        addressClient:
+          dataClient?.fs_DATABROWSE_V55WS1A?.data?.gridData?.rowset?.[0]
+            ?.F0116_ADD1 || "Adresse inconnue",
+        mois: dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.PN_AVG"] || "N/A",
+        annee: dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.CFY_AVG"] || "N/A",
+      });
+      
+      const MT = Math.ceil(factureData.montantFacture + 100);
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Suivi des Factures</Text>
+      setMontantTotal(MT);
 
-            {/* Barre de recherche */}
-            <TextInput
-                style={styles.searchBar}
-                placeholder="Rechercher un client..."
-                onChangeText={setSearchText}
-                value={searchText}
-            />
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible de récupérer les informations.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            {/* Filtres */}
-            <View style={styles.filterContainer}>
-                {["all", "payé", "non payé"].map(status => (
-                    <TouchableOpacity 
-                        key={status} 
-                        style={[styles.filterButton, filter === status && styles.activeFilter]}
-                        onPress={() => setFilter(status)}
-                    >
-                        <Text style={styles.filterText}>
-                            {status === "all" ? "Tous" : status}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+  const handleSearch = useCallback(() => {
+    if (!refClient || !refFacture) {
+      Alert.alert("Erreur", "Veuillez remplir les champs de référence.");
+      return;
+    }
+    fetchFactureData();
+  }, [refClient, refFacture]);
+
+  const initialisePaiement = async () => {
+    setLoading(true);
+    try{
+      const {clientName, addressClient, montantFacture, mois, annee} = factureData;
+      console.log(montantFacture)
+      console.log(montantTotal)
+      
+      const response = await fetch("https://preprod.api.cashless.eqima.org/api/paiement_facture/insertPost",{
+        method: "POST",
+        headers:{
+          "Content-type": "application/json",
+        },
+        body : JSON.stringify({
+          frais : 100,
+          refFacture: refFacture,
+          refClient: refClient,
+          montantFacture :  montantFacture,
+          nomClient : clientName,
+          adresseClient : addressClient,
+          mois : mois,
+          annee : annee, total : montantTotal
+        }),
+      });
+      const result = await response.json();
+      if (result.id) {
+        setIdPaiement(result.id);
+        console.log(result.id);
+        setModalVisible(false);
+        setTransactionModalVisible(true);
+      }
+    }catch(error){
+      Alert.alert("Erreur","Impossible d'initer le paiement.");
+    }
+    finally{
+      setLoading(false);
+    }
+  };
+
+  const envoyerTransaction = async () => {
+    setLoading(true);
+    
+    try{
+
+      //const signature = await solanaEb3.sendAndConfirmTransaction(connection, transaction, [fromWallet]);
+      const signature = "yuwuyqtyutytryt";
+      const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=783`
+      console.log("URL:", URI);
+      const setRef = await fetch(URI);
+
+      console.log(setRef);
+      Alert.alert("Succès", "Transaction envoyée et référence mise à jour !");
+      setTransactionModalVisible(false);
+      
+
+
+    }catch(error){
+      Alert.alert("Erreur", "Impossible d'envoyer la transaction.", setRef);
+      setTransactionModalVisible(false);
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Rechercher une Facture</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Entrez la référence client"
+        value={refClient}
+        onChangeText={setRefClient}
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Entrez la référence facture"
+        value={refFacture}
+        onChangeText={setRefFacture}
+        keyboardType="numeric"
+      />
+
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <Button mode="contained" onPress={handleSearch} style={styles.button}>
+          Rechercher
+        </Button>
+      )}
+
+      {/* Modal pour afficher les détails */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Détails de la Facture</Text>
+
+            <View style={styles.factureInfo}>
+              <Text>
+                <Text style={styles.bold}>Référence Facture:</Text> {refFacture}
+              </Text>
+              <Text>
+                <Text style={styles.bold}>Montant :</Text>{" "}
+                {Math.ceil(factureData.montantFacture)} Ar
+              </Text>
+              <Text>
+                <Text style={styles.bold}>Frais : 100 Ar</Text>
+              </Text>
+              <Text>
+                <Text style={styles.bold}>Montant Total :</Text>{" "}
+                {montantTotal} Ar
+              </Text>
+              <Text>
+                <Text style={styles.bold}>Nom Client :</Text>{" "}
+                {factureData.clientName}
+              </Text>
+              <Text>
+                <Text style={styles.bold}>Adresse :</Text>{" "}
+                {factureData.addressClient}
+              </Text>
+              <Text>
+                <Text style={styles.bold}>État :</Text> Non Payé
+              </Text>
             </View>
 
-            {/* Liste des factures */}
-            <FlatList
-                data={facturesFiltrées}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => (
-                    <View style={[styles.factureItem, { borderLeftColor: statusColors[item.statut] }]}>
-                        <Text style={styles.factureText}>{item.client}</Text>
-                        <Text style={styles.factureText}>{item.montant}</Text>
-                        <Text style={[styles.statut, { color: statusColors[item.statut] }]}>{item.statut}</Text>
-                    </View>
-                )}
-            />
+            <TouchableOpacity onPress={initialisePaiement} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Payer</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-    );
+      </Modal>
+      {/* Modal Transaction */}
+      <Modal visible={transactionModalVisible} transparent={true} onRequestClose={() => setTransactionModalVisible(false)}>
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirmer la Transaction</Text>
+            {loading ? <ActivityIndicator size="large" color="blue" /> : <Button mode="contained" onPress={envoyerTransaction} style={styles.button}>Confirmation de paiement</Button>}
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
 };
 
+// Styles optimisés pour un design plus moderne
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: "#fff",
-    },
-    title: {
-        fontSize: 22,
-        fontWeight: "bold",
-        marginBottom: 10,
-        textAlign: "center",
-    },
-    searchBar: {
-        height: 40,
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 10,
-    },
-    filterContainer: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        marginBottom: 10,
-    },
-    filterButton: {
-        paddingVertical: 5,
-        paddingHorizontal: 15,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: "#333",
-    },
-    activeFilter: {
-        backgroundColor: "#333",
-    },
-    filterText: {
-        // color: "#000",
-        fontSize : 20,
-    },
-    factureItem: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        padding: 15,
-        marginBottom: 5,
-        borderRadius: 5,
-        borderLeftWidth: 5,
-        backgroundColor: "#f9f9f9",
-    },
-    factureText: {
-        fontSize: 16,
-    },
-    statut: {
-        fontWeight: "bold",
-    },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f8f9fa",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
+  input: {
+    width: "100%",
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginBottom: 15,
+    backgroundColor: "#fff",
+    fontSize: 16,
+  },
+  button: {
+    width: "100%",
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: "#007bff",
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  factureInfo: {
+    alignItems: "flex-start",
+    marginBottom: 20,
+  },
+  bold: {
+    fontWeight: "bold",
+    color: "#555",
+  },
+  closeButton: {
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
 });
 
-export default Invoice;
+export default FactureScreen;

@@ -1,0 +1,252 @@
+{
+	"info": {
+		"_postman_id": "b1f54b0b-d744-4ede-9a60-353412e0d321",
+		"name": "Jirakaiky preprod",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26073176"
+	},
+	"item": [
+		{
+			"name": "1-Get InfoClient",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/jiramacontroller/infoClient?referencefacture=235210721194938&referenceclient=23528100454",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"jiramacontroller",
+						"infoClient"
+					],
+					"query": [
+						{
+							"key": "referencefacture",
+							"value": "235210721194938"
+						},
+						{
+							"key": "referenceclient",
+							"value": "23528100454"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2-GET Reference",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/jiramacontroller/montantFacture2?referencefacture=235210721194938",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"jiramacontroller",
+						"montantFacture2"
+					],
+					"query": [
+						{
+							"key": "referencefacture",
+							"value": "235210721194938"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3-POST IntiePaiement",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"frais\": 100.0,\r\n    \"signature\": \"EQ\",\r\n    \"latitude\": \"-18.879190\",\r\n    \"longitude\": \"47.507905\",\r\n    \"montantFacture\": 64076.28,\r\n    \"numeroPayeur\": \"0343500003\",\r\n    \"numeroCashpoint\": \"0380885149\",\r\n    \"operateur\": \"Volanaka\",\r\n    \"refFacture\": \"235210721194938\",\r\n    \"refTransaction\": \"\",\r\n    \"total\": 64176.28,\r\n    \"datePaiement\": \"2025-03-05 13:31:23.0\",\r\n    \"codeRecu\": \"\",\r\n    \"nomClient\": \"RAHARINJAKA ANDRIANIRINA AIMEE\",\r\n    \"adresseClient\": \"VB I 025 TONGARIVO\",\r\n    \"refClient\": \"23528100454\",\r\n    \"mois\": \"Juillet\",\r\n    \"annee\": \"2021\",\r\n    \"etat\": \"INITIE\",\r\n    \"anterieur\": null,\r\n    \"caissier\": \"vka-001\",\r\n    \"idDistributeur\": null,\r\n    \"androidId\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/api/paiement_facture/insertPost",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"api",
+						"paiement_facture",
+						"insertPost"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4-SET ref Transaction Mvola ou autre",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=azerdnfjnjdnfjndjnlfklsnfjsjcns&idPaiement=779",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"api",
+						"paiement_facture",
+						"setRefTransaction"
+					],
+					"query": [
+						{
+							"key": "reftransaction",
+							"value": "azerdnfjnjdnfjndjnlfklsnfjsjcns"
+						},
+						{
+							"key": "idPaiement",
+							"value": "779"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5-Reglement jirama maka code reçu",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/jiramacontroller/reglementFacture?referencefacture=235210721194938&controlid=0343500003_Eqima&transid=azerdnfjnjdnfjndjnlfklsnfjsjcns&operationid=20253779_Volanaka&operateur=Volanaka",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"jiramacontroller",
+						"reglementFacture"
+					],
+					"query": [
+						{
+							"key": "referencefacture",
+							"value": "235210721194938"
+						},
+						{
+							"key": "controlid",
+							"value": "0343500003_Eqima"
+						},
+						{
+							"key": "transid",
+							"value": "azerdnfjnjdnfjndjnlfklsnfjsjcns"
+						},
+						{
+							"key": "operationid",
+							"value": "20253779_Volanaka"
+						},
+						{
+							"key": "operateur",
+							"value": "Volanaka"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6-SET CODE RECU",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/api/paiement_facture/setCodeRecu?coderecu=25000005&id=779",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"api",
+						"paiement_facture",
+						"setCodeRecu"
+					],
+					"query": [
+						{
+							"key": "coderecu",
+							"value": "25000005"
+						},
+						{
+							"key": "id",
+							"value": "779"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7-SET ETAT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://preprod.api.cashless.eqima.org/api/paiement_facture/setState?etat=SUCCESS&id=779",
+					"protocol": "https",
+					"host": [
+						"preprod",
+						"api",
+						"cashless",
+						"eqima",
+						"org"
+					],
+					"path": [
+						"api",
+						"paiement_facture",
+						"setState"
+					],
+					"query": [
+						{
+							"key": "etat",
+							"value": "SUCCESS"
+						},
+						{
+							"key": "id",
+							"value": "779"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
