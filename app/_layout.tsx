@@ -15,6 +15,7 @@ import CreateWallet from "../navigation/screens/ConnectWallet/CreateWallet";
 import ImportPrivateKey from "../navigation/screens/ConnectWallet/ImportPrivateKey";
 import walletLogin  from "../navigation/screens/ConnectWallet/walletLogin";
 import TokensList from "@/Web3/TokensList";
+import ScanCodeQr from "@/components/ScanCodeQr"
 import { Buffer } from "buffer";
 global.Buffer = global.Buffer || Buffer;
 
@@ -30,7 +31,9 @@ export default function RootLayout() {
           <Stack.Screen name="ImportPrivateKey" component={ImportPrivateKey} />
           <Stack.Screen name="walletLogin" component={walletLogin} />
           <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/> 
+          
           <Stack.Screen name="Recevoir" component={Recevoir}  />
+          <Stack.Screen name="ScanCodeQr" component={ScanCodeQr}  />
 
           <Stack.Screen name="Envoyer" component={Envoyer} options={{headerShown: true,}}/>
           <Stack.Screen name="tokensList" component={TokensList} options={{headerShown: true, title : "Liste des tokens"}}/>
