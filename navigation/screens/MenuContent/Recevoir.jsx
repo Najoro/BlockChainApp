@@ -3,9 +3,15 @@ import { View, Text, StyleSheet , TouchableOpacity,Alert } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import DropdownComponent from "../../../components/DropdownComponent ";
 // import Clipboard  from "@react-native-clipboard/clipboard";
+import {SOLANA_WALLET_PUBLIC_KEY} from "@/app.config";
+
+import { Buffer } from "buffer";
+global.Buffer = Buffer;
+
+const pubkey = SOLANA_WALLET_PUBLIC_KEY;
 
 function Recevoir() {
-  const walletAddress = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"; // Adresse fictive Bitcoin
+  const walletAddress = pubkey;
  
   const handleClick = () => {
     alert("Copier");
