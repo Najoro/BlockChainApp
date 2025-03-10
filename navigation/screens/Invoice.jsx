@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import keyPair from "@/token/wallet/id.json";
+import {Image} from "react-native";
 import {
   View,
   ActivityIndicator,
@@ -220,6 +221,10 @@ const FactureScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Image 
+      source={require("@/assets/images/JirakaikyLogo.jpg")} 
+      style={{ width: 200, height: 150 }} 
+    />
       <Text style={styles.title}>Rechercher une Facture</Text>
 
       <TextInput
@@ -302,7 +307,13 @@ const FactureScreen = () => {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
+            
             <Text style={styles.modalTitle}>Confirmer la Transaction</Text>
+            <Text>Montant total transaction</Text>
+            <Text></Text>
+            <Text>Montant</Text>
+            <Text>Montant</Text>
+            <Text>Montant</Text>
             {loading ? (
               <ActivityIndicator size="large" color="blue" />
             ) : (
@@ -311,7 +322,7 @@ const FactureScreen = () => {
                 onPress={envoyerTransaction}
                 style={styles.button}
               >
-                Confirmation de paiement
+                Confirmation
               </Button>
             )}
           </View>

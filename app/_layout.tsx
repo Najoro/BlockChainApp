@@ -17,8 +17,6 @@ import walletLogin  from "../navigation/screens/ConnectWallet/walletLogin";
 import SecurePayment from "@/navigation/screens/SecurePayment"
 import TokensList from "@/Web3/TokensList";
 import ScanCodeQr from "@/components/ScanCodeQr"
-import { Buffer } from "buffer";
-global.Buffer = global.Buffer || Buffer;
 
 
 const Stack = createStackNavigator();
