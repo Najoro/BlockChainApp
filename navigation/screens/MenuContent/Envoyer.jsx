@@ -56,7 +56,7 @@ const createToken2022ATA = async (connection, payer, mint, owner) => {
   return ata;
 };
 
-const EnvoyerPage = (props) => {
+ const EnvoyerPage = (props) => {
   const { route } = props; 
   const token = route?.params?.token;
   const addressScan = route?.params?.address || null;

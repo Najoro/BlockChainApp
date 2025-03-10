@@ -13,8 +13,8 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23524720092");
-  const [refFacture, setRefFacture] = useState("235210721196050");
+  const [refClient, setRefClient] = useState("23524720002");
+  const [refFacture, setRefFacture] = useState("235210721195948");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -58,8 +58,6 @@ const FactureScreen = () => {
 
       setMontantTotal(MT);
       console.log(montantTotal);
-
-      setModalVisible(true);
     } catch (error) {
       Alert.alert("Erreur", "Impossible de récupérer les informations.");
     } finally {
@@ -72,6 +70,14 @@ const FactureScreen = () => {
       Alert.alert("Erreur", "Veuillez remplir les champs de référence.");
       return;
     }
+    if(factureData.montantFacture === "N/A" || 0 || "null"){
+      setModalVisible(false);
+      Alert.alert('Cette facture est déjà payé');
+    }else{
+      setModalVisible(true);
+      setLoading(false);
+    }
+
     fetchFactureData();
   }, [refClient, refFacture]);
 
@@ -256,8 +262,8 @@ const FactureScreen = () => {
                 <Text style={styles.bold}>Référence Facture:</Text> {refFacture}
               </Text>
               <Text>
-                <Text style={styles.bold}>Montant :</Text>{" "}
-                {Math.ceil(factureData.montantFacture)} Ar
+                <Text style={styles.bold}>Montant :</Text>
+                {Math.ceil(factureData.montantFacture)}
               </Text>
               <Text>
                 <Text style={styles.bold}>Frais : 100 Ar</Text>
@@ -315,7 +321,6 @@ const FactureScreen = () => {
   );
 };
 
-// Styles optimisés pour un design plus moderne
 const styles = StyleSheet.create({
   container: {
     flex: 1,

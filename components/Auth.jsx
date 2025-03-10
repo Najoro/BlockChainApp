@@ -73,7 +73,6 @@ const Auth = () => {
               isAuthenticated ? styles.connectedText : styles.disconnectedText,
             ]}
           >
-            {isAuthenticated ? "Connecté ✅" : "Non connecté ❌"}
           </Text>
 
           {!isAuthenticated ? (
