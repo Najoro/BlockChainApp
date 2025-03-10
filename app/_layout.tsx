@@ -33,11 +33,10 @@ export default function RootLayout() {
           <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/> 
           
           <Stack.Screen name="Recevoir" component={Recevoir}  />
-          <Stack.Screen name="ScanCodeQr" component={ScanCodeQr}  />
+          <Stack.Screen name="ScanCodeQr" component={ScanCodeQr} options={{headerShown: true, title:"QR code"}} />
 
           <Stack.Screen name="Envoyer" component={Envoyer} options={{headerShown: true,}}/>
           <Stack.Screen name="tokensList" component={TokensList} options={{headerShown: true, title : "Liste des tokens"}}/>
-
 
           <Stack.Screen name="Echanger" component={Echanger} />
           <Stack.Screen name="Encaisser" component={Encaisser} />
