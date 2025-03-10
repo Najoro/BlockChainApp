@@ -4,7 +4,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from "uuid";
 import {Connection,clusterApiUrl} from "@solana/web3.js";
 import GetSolanaBalance from './GetSolanaBalance';
-import GetTokenAccount from "./GetTokenAccount";
+import {TokenDisplay} from "./GetTokenAccount";
 
 import {SOLANA_WALLET_PUBLIC_KEY, SOLANA_RPC_URL} from "@/app.config";
 
@@ -22,7 +22,7 @@ const ConnectWallet = () => {
       </View>
       <View>
         <Text style={styles.title}>Token associé</Text>
-        <GetTokenAccount connection={connection} publicKey={pubkey}  />
+        <TokenDisplay connection={connection} publicKey={pubkey}  />
       </View>
     </View>
   )
