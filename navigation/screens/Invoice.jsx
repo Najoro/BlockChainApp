@@ -13,8 +13,8 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23524780190");
-  const [refFacture, setRefFacture] = useState("235210721196922");
+  const [refClient, setRefClient] = useState("23524720092");
+  const [refFacture, setRefFacture] = useState("235210721196050");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,6 @@ const FactureScreen = () => {
     montantFacture: "",
   });
 
-  // Fonction pour récupérer les données de la facture et du client
   const fetchFactureData = async () => {
     setLoading(true);
     try {
@@ -54,10 +53,11 @@ const FactureScreen = () => {
         mois: dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.PN_AVG"] || "N/A",
         annee: dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.CFY_AVG"] || "N/A",
       });
-      
+
       const MT = Math.ceil(factureData.montantFacture + 100);
 
       setMontantTotal(MT);
+      console.log(montantTotal);
 
       setModalVisible(true);
     } catch (error) {
@@ -77,66 +77,140 @@ const FactureScreen = () => {
 
   const initialisePaiement = async () => {
     setLoading(true);
-    try{
-      const {clientName, addressClient, montantFacture, mois, annee} = factureData;
-      console.log(montantFacture)
-      console.log(montantTotal)
-      
-      const response = await fetch("https://preprod.api.cashless.eqima.org/api/paiement_facture/insertPost",{
-        method: "POST",
-        headers:{
-          "Content-type": "application/json",
-        },
-        body : JSON.stringify({
-          frais : 100,
-          refFacture: refFacture,
-          refClient: refClient,
-          montantFacture :  montantFacture,
-          nomClient : clientName,
-          adresseClient : addressClient,
-          mois : mois,
-          annee : annee, total : montantTotal
-        }),
-      });
+    try {
+      const { clientName, addressClient, montantFacture, mois, annee } =
+        factureData;
+
+      const response = await fetch(
+        "https://preprod.api.cashless.eqima.org/api/paiement_facture/insertPost",
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            frais: 100,
+            operateur: "Volanaka",
+            numeroPayeur: "adressPayeurVka",
+            refFacture: refFacture,
+            refClient: refClient,
+            montantFacture: montantFacture,
+            nomClient: clientName,
+            adresseClient: addressClient,
+            mois: mois,
+            annee: annee,
+            caissier: "vka-001",
+            etat: "INITIE",
+            total: montantTotal,
+          }),
+        }
+      );
       const result = await response.json();
       if (result.id) {
         setIdPaiement(result.id);
+        const dateNow = new Date();
         console.log(result.id);
         setModalVisible(false);
         setTransactionModalVisible(true);
       }
-    }catch(error){
-      Alert.alert("Erreur","Impossible d'initer le paiement.");
-    }
-    finally{
+    } catch (error) {
+      Alert.alert("Erreur", "Impossible d'initer le paiement.");
+    } finally {
       setLoading(false);
     }
   };
 
   const envoyerTransaction = async () => {
     setLoading(true);
-    
-    try{
-
-      //const signature = await solanaEb3.sendAndConfirmTransaction(connection, transaction, [fromWallet]);
+    try {
       const signature = "yuwuyqtyutytryt";
-      const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=783`
-      console.log("URL:", URI);
+
+      const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=${idPaiement}`;
       const setRef = await fetch(URI);
 
-      console.log(setRef);
+      if (!setRef.ok) {
+        throw new Error(`Erreur API: ${setRef.status}`);
+      }
+
       Alert.alert("Succès", "Transaction envoyée et référence mise à jour !");
-      setTransactionModalVisible(false);
-      
+      console.log("Réponse API setRef:", await setRef.json());
 
+      const operateur = "Volanaka";
+      const dateNow = new Date();
+      const dateFormat = `${dateNow.getFullYear()}${dateNow.getMonth() + 1}`;
+      const operationId = `${dateFormat}${idPaiement}_${operateur}`;
+      const controlId = "controlIdadressPayeurVka_Eqima";
+      await reglementJirama(signature, operateur, operationId, controlId);
 
-    }catch(error){
-      Alert.alert("Erreur", "Impossible d'envoyer la transaction.", setRef);
       setTransactionModalVisible(false);
-    }finally{
+    } catch (error) {
+      Alert.alert(
+        "Erreur",
+        `Impossible d'envoyer la transaction: ${error.message}`
+      );
+      console.error("Erreur envoyerTransaction:", error);
+      setTransactionModalVisible(false);
+    } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const reglementJirama = async (
+    signature,
+    operateur,
+    operationId,
+    controlId
+  ) => {
+    try {
+      const url = `https://preprod.api.cashless.eqima.org/jiramacontroller/reglementFacture?referencefacture=${refFacture}&controlid=${controlId}&transid=${signature}&operationid=${operationId}&operateur=${operateur}`;
+
+      const reglementFact = await fetch(url);
+      const reglementFactData = await reglementFact.json();
+
+      if (!reglementFact.ok) {
+        throw new Error(`Erreur API: ${reglementFact.status}`);
+      }
+
+      console.log("Réponse du règlement :", reglementFactData);
+      const getCodeRecu =
+        reglementFactData?.fs_P55PAYFA_W55PAYFAA?.data?.txtRecuCode_31?.value ||
+        "Reçu non disponible";
+      console.log("Code reçu 3:", getCodeRecu);
+
+      //Recuperation du code reçu
+      const setCodeRecuURL = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setCodeRecu?coderecu=${getCodeRecu}&id=${idPaiement}`;
+      const setCodeRecuResponse = await fetch(setCodeRecuURL);
+
+      if (!setCodeRecuResponse.ok) {
+        throw new Error(
+          `Erreur API setCodeRecu: ${setCodeRecuResponse.status}`
+        );
+      }
+      console.log("Code reçu mis à jour avec succès !");
+
+      //Mise à jour de l'état du paiement à SUCCESS
+      const setStateUrl = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setState?etat=SUCCESS&id=${idPaiement}`;
+      const setStateResponse = await fetch(setStateUrl);
+
+      if (!setStateResponse) {
+        throw new Error(`Erreur API setState: ${setStateResponse.status}`);
+      }
+      console.log("État du paiement mis à jour en SUCCESS !");
+
+      Alert.alert(
+        "Succès",
+        "Règlement effectué, code reçu mis à jour et paiement validé !"
+      );
+      setTransactionModalVisible(false);
+    } catch (error) {
+      Alert.alert(
+        "Erreur",
+        `Impossible d'effectuer le règlement: ${error.message}`
+      );
+      console.error("Erreur reglementJirama:", error);
+      setTransactionModalVisible(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -189,8 +263,8 @@ const FactureScreen = () => {
                 <Text style={styles.bold}>Frais : 100 Ar</Text>
               </Text>
               <Text>
-                <Text style={styles.bold}>Montant Total :</Text>{" "}
-                {montantTotal} Ar
+                <Text style={styles.bold}>Montant Total :</Text> {montantTotal}{" "}
+                Ar
               </Text>
               <Text>
                 <Text style={styles.bold}>Nom Client :</Text>{" "}
@@ -205,18 +279,35 @@ const FactureScreen = () => {
               </Text>
             </View>
 
-            <TouchableOpacity onPress={initialisePaiement} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={initialisePaiement}
+              style={styles.closeButton}
+            >
               <Text style={styles.closeButtonText}>Payer</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
       {/* Modal Transaction */}
-      <Modal visible={transactionModalVisible} transparent={true} onRequestClose={() => setTransactionModalVisible(false)}>
+      <Modal
+        visible={transactionModalVisible}
+        transparent={true}
+        onRequestClose={() => setTransactionModalVisible(false)}
+      >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Confirmer la Transaction</Text>
-            {loading ? <ActivityIndicator size="large" color="blue" /> : <Button mode="contained" onPress={envoyerTransaction} style={styles.button}>Confirmation de paiement</Button>}
+            {loading ? (
+              <ActivityIndicator size="large" color="blue" />
+            ) : (
+              <Button
+                mode="contained"
+                onPress={envoyerTransaction}
+                style={styles.button}
+              >
+                Confirmation de paiement
+              </Button>
+            )}
           </View>
         </View>
       </Modal>
