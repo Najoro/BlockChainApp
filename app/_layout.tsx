@@ -14,6 +14,7 @@ import Invoice from "@/navigation/screens/Invoice";
 import CreateWallet from "../navigation/screens/ConnectWallet/CreateWallet";
 import ImportPrivateKey from "../navigation/screens/ConnectWallet/ImportPrivateKey";
 import walletLogin  from "../navigation/screens/ConnectWallet/walletLogin";
+import SecurePayment from "@/navigation/screens/SecurePayment"
 import TokensList from "@/Web3/TokensList";
 import ScanCodeQr from "@/components/ScanCodeQr"
 import { Buffer } from "buffer";
@@ -30,7 +31,8 @@ export default function RootLayout() {
           <Stack.Screen name="CreateWallet" component={CreateWallet} />
           <Stack.Screen name="ImportPrivateKey" component={ImportPrivateKey} />
           <Stack.Screen name="walletLogin" component={walletLogin} />
-          <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/> 
+          <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/>
+          <Stack.Screen name="securePayement" component={SecurePayment} options={{headerShown: true, title:"QR code"}} />
           
           <Stack.Screen name="Recevoir" component={Recevoir}  />
           <Stack.Screen name="ScanCodeQr" component={ScanCodeQr} options={{headerShown: true, title:"QR code"}} />

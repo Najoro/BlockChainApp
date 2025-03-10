@@ -8,6 +8,7 @@ import Invoice from "./screens/Invoice";
 import Home from './screens/Home';
 import History from './screens/History';
 import Profile from './screens/Profile';
+import SecurePayment from './screens/SecurePayment';
 
 //  Création du Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
@@ -17,6 +18,7 @@ const TABS_CONFIG = [
   { name: "Home", component: Home, icon: "home-outline" },
   { name: "History", component: History, icon: "time-outline" },
   { name: "Facture", component: Invoice, icon: "receipt-outline" },
+  { name: "Payement Securiser", component: SecurePayment, icon: "document-lock-outline" },
   { name: "Profile", component: Profile, icon: "person-outline" },
   
 ];
