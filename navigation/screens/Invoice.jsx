@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
-import keyPair from "@/token/wallet/id.json";
 import {Image} from "react-native";
+import {SOLANA_WALLET_PUBLIC_KEY, SOLANA_WALLET_PRIVATE_KEY} from "@/app.config"
 import {
   View,
   ActivityIndicator,
@@ -14,18 +14,21 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23524720002");
-  const [refFacture, setRefFacture] = useState("235210721195948");
+  const [refClient, setRefClient] = useState("23528100454");
+  const [refFacture, setRefFacture] = useState("235210721194938");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
   const [montantTotal, setMontantTotal] = useState(0);
+  const [adressRecipient, setAdressRecipient] = useState("Hz5wAtoNTA1fqHZkvZYufzNso4xwZXXCRMhYQnrwzxCx");
+  const [adressSender, setAdressSender] = useState("7qfzthjwoh4hDk5ZhFARMDXEpkCDtCVkmrpG4iWU2pP4");
   const [transactionModalVisible, setTransactionModalVisible] = useState(false);
   const [factureData, setFactureData] = useState({
     clientName: "",
     addressClient: "",
     montantFacture: "",
   });
+
 
   const fetchFactureData = async () => {
     setLoading(true);
@@ -55,7 +58,7 @@ const FactureScreen = () => {
         annee: dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.CFY_AVG"] || "N/A",
       });
 
-      const MT = Math.ceil(factureData.montantFacture + 100);
+      const MT = factureData.montantFacture + 100;
 
       setMontantTotal(MT);
       console.log(montantTotal);
@@ -67,11 +70,14 @@ const FactureScreen = () => {
   };
 
   const handleSearch = useCallback(() => {
+    
+    fetchFactureData();
+    console.log("Montant total",montantTotal)
     if (!refClient || !refFacture) {
       Alert.alert("Erreur", "Veuillez remplir les champs de référence.");
       return;
     }
-    if(factureData.montantFacture === "N/A" || 0 || "null"){
+    if(factureData.montantFacture === "N/A"  || NaN || "NaN"){
       setModalVisible(false);
       Alert.alert('Cette facture est déjà payé');
     }else{
@@ -79,11 +85,9 @@ const FactureScreen = () => {
       setLoading(false);
     }
 
-    fetchFactureData();
   }, [refClient, refFacture]);
 
   const initialisePaiement = async () => {
-    setLoading(true);
     try {
       const { clientName, addressClient, montantFacture, mois, annee } =
         factureData;
@@ -98,7 +102,7 @@ const FactureScreen = () => {
           body: JSON.stringify({
             frais: 100,
             operateur: "Volanaka",
-            numeroPayeur: "adressPayeurVka",
+            numeroPayeur: SOLANA_WALLET_PUBLIC_KEY,
             refFacture: refFacture,
             refClient: refClient,
             montantFacture: montantFacture,
@@ -126,13 +130,44 @@ const FactureScreen = () => {
       setLoading(false);
     }
   };
+  const fetchTransfer = async () => {
+    const transferAPI = "https://preprod-vka2.eqima.org/wallet/transfer";
+      const body = {
+        senderAddress: adressSender,
+        receiverAddress: adressRecipient,
+        amount: montantTotal,
+        senderKey: SOLANA_WALLET_PRIVATE_KEY};
+  
+      console.log("Test transfer - Sender Address:", body.amount);
+  
+      try {
+          const response = await fetch(transferAPI, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(body),
+          });
+  
+          const result = await response.json();
+          console.log("Réponse de l'API:", result);
+          setLoading(false);
+          return result;
+      } catch (error) {
+          console.error("Erreur lors de la requête:", error);
+          setLoading(false);
+      }
+  };
 
   const envoyerTransaction = async () => {
     setLoading(true);
-    try {
-      const signature = "yuwuyqtyutytryt";
 
-      const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=${idPaiement}`;
+
+    try {
+      const resultTransfer = await fetchTransfer();
+      const signature = resultTransfer.signature;
+      if(signature != undefined) {
+        const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=${idPaiement}`;
       const setRef = await fetch(URI);
 
       if (!setRef.ok) {
@@ -150,6 +185,7 @@ const FactureScreen = () => {
       await reglementJirama(signature, operateur, operationId, controlId);
 
       setTransactionModalVisible(false);
+      }
     } catch (error) {
       Alert.alert(
         "Erreur",
@@ -225,7 +261,7 @@ const FactureScreen = () => {
       source={require("@/assets/images/JirakaikyLogo.jpg")} 
       style={{ width: 200, height: 150 }} 
     />
-      <Text style={styles.title}>Rechercher une Facture</Text>
+      <Text style={styles.title}>Rechercher une Facture  {montantTotal}</Text>
 
       <TextInput
         style={styles.input}
@@ -307,13 +343,16 @@ const FactureScreen = () => {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
-            
             <Text style={styles.modalTitle}>Confirmer la Transaction</Text>
-            <Text>Montant total transaction</Text>
-            <Text></Text>
-            <Text>Montant</Text>
-            <Text>Montant</Text>
-            <Text>Montant</Text>
+            <Text>Montant total de la transaction : {montantTotal} Ar</Text>
+            <Text>Payer avec : VOLANAKA</Text>
+            <Text>Adress du receveur:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Entrez l'adresse du destinataire'"
+              value={adressRecipient}
+              onChangeText={setAdressRecipient}
+            />
             {loading ? (
               <ActivityIndicator size="large" color="blue" />
             ) : (
