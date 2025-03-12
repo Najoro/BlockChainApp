@@ -1,6 +1,11 @@
 import React, { useState, useCallback } from "react";
-import {Image} from "react-native";
-import {SOLANA_WALLET_PUBLIC_KEY, SOLANA_WALLET_PRIVATE_KEY} from "@/app.config"
+import { Image } from "react-native";
+import {
+  SOLANA_WALLET_PUBLIC_KEY,
+  SOLANA_WALLET_PRIVATE_KEY,
+} from "@/app.config";
+
+import Ionicons from "react-native-vector-icons/Ionicons";
 import {
   View,
   ActivityIndicator,
@@ -14,21 +19,25 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23528100454");
-  const [refFacture, setRefFacture] = useState("235210721194938");
+  const [refClient, setRefClient] = useState("23528220791");
+  const [refFacture, setRefFacture] = useState("235210721202262");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
   const [montantTotal, setMontantTotal] = useState(0);
-  const [adressRecipient, setAdressRecipient] = useState("Hz5wAtoNTA1fqHZkvZYufzNso4xwZXXCRMhYQnrwzxCx");
-  const [adressSender, setAdressSender] = useState("7qfzthjwoh4hDk5ZhFARMDXEpkCDtCVkmrpG4iWU2pP4");
+  const [adressRecipient, setAdressRecipient] = useState(
+    "Hz5wAtoNTA1fqHZkvZYufzNso4xwZXXCRMhYQnrwzxCx"
+  );
+  const [adressSender, setAdressSender] = useState(
+    "7qfzthjwoh4hDk5ZhFARMDXEpkCDtCVkmrpG4iWU2pP4"
+  );
   const [transactionModalVisible, setTransactionModalVisible] = useState(false);
+  const [outputFacture, setOutpuFacture] = useState("");
   const [factureData, setFactureData] = useState({
     clientName: "",
     addressClient: "",
     montantFacture: "",
   });
-
 
   const fetchFactureData = async () => {
     setLoading(true);
@@ -62,6 +71,19 @@ const FactureScreen = () => {
 
       setMontantTotal(MT);
       console.log(montantTotal);
+
+      if (
+        !dataFacture?.ds_F55INV?.output ||
+        dataFacture.ds_F55INV.output.length === 0
+      ) {
+        setModalVisible(false);
+        Alert.alert("Cette facture est déjà payée");
+        setLoading(false);
+        return;
+      } else {
+        setModalVisible(true);
+        setLoading(false);
+      }
     } catch (error) {
       Alert.alert("Erreur", "Impossible de récupérer les informations.");
     } finally {
@@ -69,22 +91,16 @@ const FactureScreen = () => {
     }
   };
 
-  const handleSearch = useCallback(() => {
-    
-    fetchFactureData();
-    console.log("Montant total",montantTotal)
-    if (!refClient || !refFacture) {
-      Alert.alert("Erreur", "Veuillez remplir les champs de référence.");
-      return;
+  const handleSearch = useCallback(async () => {
+    try {
+      if (!refClient || !refFacture) {
+        Alert.alert("Erreur", "Veuillez remplir les champs de référence.");
+        return;
+      }
+      await fetchFactureData();
+    } catch (error) {
+      Alert.alert("Cette reference est inexistante");
     }
-    if(factureData.montantFacture === "N/A"  || NaN || "NaN"){
-      setModalVisible(false);
-      Alert.alert('Cette facture est déjà payé');
-    }else{
-      setModalVisible(true);
-      setLoading(false);
-    }
-
   }, [refClient, refFacture]);
 
   const initialisePaiement = async () => {
@@ -132,59 +148,59 @@ const FactureScreen = () => {
   };
   const fetchTransfer = async () => {
     const transferAPI = "https://preprod-vka2.eqima.org/wallet/transfer";
-      const body = {
-        senderAddress: adressSender,
-        receiverAddress: adressRecipient,
-        amount: montantTotal,
-        senderKey: SOLANA_WALLET_PRIVATE_KEY};
-  
-      console.log("Test transfer - Sender Address:", body.amount);
-  
-      try {
-          const response = await fetch(transferAPI, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(body),
-          });
-  
-          const result = await response.json();
-          console.log("Réponse de l'API:", result);
-          setLoading(false);
-          return result;
-      } catch (error) {
-          console.error("Erreur lors de la requête:", error);
-          setLoading(false);
-      }
+    const body = {
+      senderAddress: adressSender,
+      receiverAddress: adressRecipient,
+      amount: montantTotal,
+      senderKey: SOLANA_WALLET_PRIVATE_KEY,
+    };
+
+    console.log("Test transfer - Sender Address:", body.amount);
+
+    try {
+      const response = await fetch(transferAPI, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await response.json();
+      console.log("Réponse de l'API:", result);
+      setLoading(false);
+      return result;
+    } catch (error) {
+      console.error("Erreur lors de la requête:", error);
+      setLoading(false);
+    }
   };
 
   const envoyerTransaction = async () => {
     setLoading(true);
 
-
     try {
       const resultTransfer = await fetchTransfer();
       const signature = resultTransfer.signature;
-      if(signature != undefined) {
+      if (signature != undefined) {
         const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=${idPaiement}`;
-      const setRef = await fetch(URI);
+        const setRef = await fetch(URI);
 
-      if (!setRef.ok) {
-        throw new Error(`Erreur API: ${setRef.status}`);
-      }
+        if (!setRef.ok) {
+          throw new Error(`Erreur API: ${setRef.status}`);
+        }
 
-      Alert.alert("Succès", "Transaction envoyée et référence mise à jour !");
-      console.log("Réponse API setRef:", await setRef.json());
+        Alert.alert("Succès", "Transaction envoyée et référence mise à jour !");
+        console.log("Réponse API setRef:", await setRef.json());
 
-      const operateur = "Volanaka";
-      const dateNow = new Date();
-      const dateFormat = `${dateNow.getFullYear()}${dateNow.getMonth() + 1}`;
-      const operationId = `${dateFormat}${idPaiement}_${operateur}`;
-      const controlId = "controlIdadressPayeurVka_Eqima";
-      await reglementJirama(signature, operateur, operationId, controlId);
+        const operateur = "Volanaka";
+        const dateNow = new Date();
+        const dateFormat = `${dateNow.getFullYear()}${dateNow.getMonth() + 1}`;
+        const operationId = `${dateFormat}${idPaiement}_${operateur}`;
+        const controlId = "controlIdadressPayeurVka_Eqima";
+        await reglementJirama(signature, operateur, operationId, controlId);
 
-      setTransactionModalVisible(false);
+        setTransactionModalVisible(false);
       }
     } catch (error) {
       Alert.alert(
@@ -257,12 +273,14 @@ const FactureScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image 
-      source={require("@/assets/images/JirakaikyLogo.png")} 
-      style={{ width: 200, height: 150 }} 
-    />
-      <Text style={styles.title}>Rechercher une Facture  {montantTotal}</Text>
-
+      <View style={styles.containerImage}>
+        <Image
+          source={require("@/assets/images/JirakaikyLogo.png")}
+          style={{ width: 200, height: 150 }}
+        />
+      </View>
+      <Text style={styles.label}>Référence client</Text>
+      {/* Champs de saisie */}
       <TextInput
         style={styles.input}
         placeholder="Entrez la référence client"
@@ -270,7 +288,7 @@ const FactureScreen = () => {
         onChangeText={setRefClient}
         keyboardType="numeric"
       />
-
+      <Text style={styles.label}>Référence facture</Text>
       <TextInput
         style={styles.input}
         placeholder="Entrez la référence facture"
@@ -279,8 +297,9 @@ const FactureScreen = () => {
         keyboardType="numeric"
       />
 
+      {/* Bouton de recherche */}
       {loading ? (
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator size="large" color="#007AFF" />
       ) : (
         <Button mode="contained" onPress={handleSearch} style={styles.button}>
           Rechercher
@@ -290,80 +309,105 @@ const FactureScreen = () => {
       {/* Modal pour afficher les détails */}
       <Modal
         animationType="slide"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
+        style={styles.modal}
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
+            <Ionicons
+              name="information-circle-outline"
+              size={50}
+              color="#007AFF"
+            />
             <Text style={styles.modalTitle}>Détails de la Facture</Text>
 
             <View style={styles.factureInfo}>
-              <Text>
-                <Text style={styles.bold}>Référence Facture:</Text> {refFacture}
-              </Text>
-              <Text>
-                <Text style={styles.bold}>Montant :</Text>
-                {Math.ceil(factureData.montantFacture)}
-              </Text>
-              <Text>
-                <Text style={styles.bold}>Frais : 100 Ar</Text>
-              </Text>
-              <Text>
-                <Text style={styles.bold}>Montant Total :</Text> {montantTotal}{" "}
-                Ar
-              </Text>
-              <Text>
-                <Text style={styles.bold}>Nom Client :</Text>{" "}
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Nom du client:</Text>{" "}
                 {factureData.clientName}
               </Text>
-              <Text>
-                <Text style={styles.bold}>Adresse :</Text>{" "}
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Adresse:</Text>{" "}
                 {factureData.addressClient}
               </Text>
-              <Text>
-                <Text style={styles.bold}>État :</Text> Non Payé
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Référence Facture:</Text> {refFacture}
+              </Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Montant:</Text>{" "}
+                {Math.ceil(factureData.montantFacture)} Ar
+              </Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Frais :</Text> 100 Ar
+              </Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Montant Total :</Text>{" "}
+                {Math.ceil(factureData.montantFacture) + 100} Ar
+              </Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Status :</Text> Non Payé
               </Text>
             </View>
 
-            <TouchableOpacity
+            <Button
+              mode="contained"
               onPress={initialisePaiement}
-              style={styles.closeButton}
+              style={styles.button}
             >
-              <Text style={styles.closeButtonText}>Payer</Text>
-            </TouchableOpacity>
+              Payer
+            </Button>
+            <Button
+              mode="contained"
+              onPress={() => {
+                setModalVisible(false);
+              }}
+              style={[styles.resets]}
+            >
+              <Ionicons name="close-circle-outline" size="20" color="orange" />
+            </Button>
           </View>
         </View>
       </Modal>
+
       {/* Modal Transaction */}
       <Modal
         visible={transactionModalVisible}
-        transparent={true}
+        transparent
         onRequestClose={() => setTransactionModalVisible(false)}
+        style={styles.modal}
       >
+        
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
+            <Ionicons name="wallet-outline" size={50} color="#007AFF" />
             <Text style={styles.modalTitle}>Confirmer la Transaction</Text>
-            <Text>Montant total de la transaction : {montantTotal} Ar</Text>
-            <Text>Payer avec : VOLANAKA</Text>
-            <Text>Adress du receveur:</Text>
+
+            <Text style={styles.infoText}>
+              Montant total : {montantTotal + 100} Ar
+            </Text>
+            <Text style={styles.infoText}>Payer avec : VOLANAKA</Text>
+
             <TextInput
-              style={styles.input}
-              placeholder="Entrez l'adresse du destinataire'"
+              style={[styles.input, { display: "none" }]}
+              placeholder="Adresse du destinataire"
               value={adressRecipient}
               onChangeText={setAdressRecipient}
             />
+
             {loading ? (
-              <ActivityIndicator size="large" color="blue" />
+              <ActivityIndicator size="large" color="#007AFF" />
             ) : (
               <Button
                 mode="contained"
                 onPress={envoyerTransaction}
                 style={styles.button}
               >
-                Confirmation
+                Confirmer
               </Button>
             )}
+            
           </View>
         </View>
       </Modal>
@@ -375,14 +419,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
+    //alignItems: "center",
+    padding: 25,
     backgroundColor: "#f8f9fa",
   },
+  logo: {
+    width: 200,
+    height: 150,
+    marginVertical: 20,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
+    textAlign: "center",
     color: "#333",
   },
   input: {
@@ -397,9 +446,9 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
-    backgroundColor: "#007bff",
+    backgroundColor: "#007AFF",
   },
   modalBackground: {
     flex: 1,
@@ -408,34 +457,53 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContent: {
-    width: 300,
+    width: 320,
     padding: 20,
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
+    elevation: 5,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginVertical: 10,
     color: "#333",
   },
   factureInfo: {
     alignItems: "flex-start",
     marginBottom: 20,
+    width: "100%",
+  },
+  infoText: {
+    fontSize: 16,
+    color: "#555",
+    marginVertical: 2,
   },
   bold: {
     fontWeight: "bold",
-    color: "#555",
+    color: "#333",
   },
-  closeButton: {
-    backgroundColor: "#007bff",
-    padding: 10,
-    borderRadius: 5,
+  resets: {
+    position: "absolute",
+    top: 20,
+    right: 10,
+    height: 50,
+    backgroundColor: "None",
+    fontWeight: "bold",
   },
-  closeButtonText: {
-    color: "white",
-    fontSize: 16,
+  label: {
+    fontSize: 20,
+    marginBottom: 5,
+  },
+  containerImage: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    margin: 10,
+  },
+  modal: {
+    position: "relative",
   },
 });
 
