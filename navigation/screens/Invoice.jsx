@@ -258,7 +258,7 @@ const FactureScreen = () => {
   return (
     <View style={styles.container}>
       <Image 
-      source={require("@/assets/images/JirakaikyLogo.jpg")} 
+      source={require("@/assets/images/JirakaikyLogo.png")} 
       style={{ width: 200, height: 150 }} 
     />
       <Text style={styles.title}>Rechercher une Facture  {montantTotal}</Text>
