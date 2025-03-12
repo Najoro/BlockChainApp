@@ -5,7 +5,7 @@ import {
   SOLANA_WALLET_PRIVATE_KEY,
 } from "@/app.config";
 
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import {
   View,
   ActivityIndicator,
@@ -25,10 +25,14 @@ const FactureScreen = () => {
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
   const [montantTotal, setMontantTotal] = useState(0);
-  const [adressRecipient, setAdressRecipient] = useState("Hz5wAtoNTA1fqHZkvZYufzNso4xwZXXCRMhYQnrwzxCx");
-  const [adressSender, setAdressSender] = useState("7qfzthjwoh4hDk5ZhFARMDXEpkCDtCVkmrpG4iWU2pP4");
+  const [adressRecipient, setAdressRecipient] = useState(
+    "Hz5wAtoNTA1fqHZkvZYufzNso4xwZXXCRMhYQnrwzxCx"
+  );
+  const [adressSender, setAdressSender] = useState(
+    "7qfzthjwoh4hDk5ZhFARMDXEpkCDtCVkmrpG4iWU2pP4"
+  );
   const [transactionModalVisible, setTransactionModalVisible] = useState(false);
-  const [outputFacture, setOutpuFacture] = useState("")
+  const [outputFacture, setOutpuFacture] = useState("");
   const [factureData, setFactureData] = useState({
     clientName: "",
     addressClient: "",
@@ -49,7 +53,7 @@ const FactureScreen = () => {
 
       const dataFacture = await factureResponse.json();
       const dataClient = await clientResponse.json();
-      
+
       setFactureData({
         montantFacture:
           dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.55TRINVA_SUM"] || "N/A",
@@ -67,15 +71,18 @@ const FactureScreen = () => {
 
       setMontantTotal(MT);
       console.log(montantTotal);
-      
-      if (!dataFacture?.ds_F55INV?.output || dataFacture.ds_F55INV.output.length === 0) {
+
+      if (
+        !dataFacture?.ds_F55INV?.output ||
+        dataFacture.ds_F55INV.output.length === 0
+      ) {
         setModalVisible(false);
         Alert.alert("Cette facture est déjà payée");
         setLoading(false);
         return;
-      }else{
-      setModalVisible(true);
-      setLoading(false);
+      } else {
+        setModalVisible(true);
+        setLoading(false);
       }
     } catch (error) {
       Alert.alert("Erreur", "Impossible de récupérer les informations.");
@@ -85,14 +92,14 @@ const FactureScreen = () => {
   };
 
   const handleSearch = useCallback(async () => {
-    try{
+    try {
       if (!refClient || !refFacture) {
         Alert.alert("Erreur", "Veuillez remplir les champs de référence.");
         return;
       }
       await fetchFactureData();
-    }catch(error){
-      Alert.alert("Cette reference est inexistante")
+    } catch (error) {
+      Alert.alert("Cette reference est inexistante");
     }
   }, [refClient, refFacture]);
 
@@ -266,12 +273,13 @@ const FactureScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image 
-      source={require("@/assets/images/JirakaikyLogo.png")} 
-      style={{ width: 200, height: 150 }} 
-    />
-      <Text style={styles.title}>Rechercher une Facture  {montantTotal}</Text>
-
+      <View style = {styles.containerImage}>
+        <Image
+          source={require("@/assets/images/JirakaikyLogo.png")}
+          style={{ width: 200, height: 150 }}
+        />
+      </View>
+      <Text style={styles.label}>Référence client</Text>
       {/* Champs de saisie */}
       <TextInput
         style={styles.input}
@@ -280,7 +288,7 @@ const FactureScreen = () => {
         onChangeText={setRefClient}
         keyboardType="numeric"
       />
-
+      <Text style={styles.label}>Référence facture</Text>
       <TextInput
         style={styles.input}
         placeholder="Entrez la référence facture"
@@ -304,6 +312,7 @@ const FactureScreen = () => {
         transparent
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
+        style={styles.modal}
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
@@ -316,21 +325,29 @@ const FactureScreen = () => {
 
             <View style={styles.factureInfo}>
               <Text style={styles.infoText}>
+                <Text style={styles.bold}>Nom du client:</Text>{" "}
+                {factureData.clientName}
+              </Text>
+              <Text style={styles.infoText}>
+                <Text style={styles.bold}>Adresse:</Text>{" "}
+                {factureData.addressClient}
+              </Text>
+              <Text style={styles.infoText}>
                 <Text style={styles.bold}>Référence Facture:</Text> {refFacture}
               </Text>
               <Text style={styles.infoText}>
-                <Text style={styles.bold}>Montant :</Text>{" "}
-                {factureData.montantFacture} Ar
+                <Text style={styles.bold}>Montant:</Text>{" "}
+                {Math.ceil(factureData.montantFacture)} Ar
               </Text>
               <Text style={styles.infoText}>
                 <Text style={styles.bold}>Frais :</Text> 100 Ar
               </Text>
               <Text style={styles.infoText}>
                 <Text style={styles.bold}>Montant Total :</Text>{" "}
-                {factureData.montantFacture + 100} Ar
+                {Math.ceil(factureData.montantFacture) + 100} Ar
               </Text>
               <Text style={styles.infoText}>
-                <Text style={styles.bold}>État :</Text> Non Payé
+                <Text style={styles.bold}>Status :</Text> Non Payé
               </Text>
             </View>
 
@@ -341,6 +358,14 @@ const FactureScreen = () => {
             >
               Payer
             </Button>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(false);
+              }}
+              style={[styles.resets]}
+            >
+              <Ionicons name= "close-circle-outline" size="40" color= "orange"/>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -362,7 +387,7 @@ const FactureScreen = () => {
             <Text style={styles.infoText}>Payer avec : VOLANAKA</Text>
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { display: "none" }]}
               placeholder="Adresse du destinataire"
               value={adressRecipient}
               onChangeText={setAdressRecipient}
@@ -376,7 +401,7 @@ const FactureScreen = () => {
                 onPress={envoyerTransaction}
                 style={styles.button}
               >
-                Confirmer
+                <ion-icon name="close-circle-outline"></ion-icon>
               </Button>
             )}
           </View>
@@ -390,8 +415,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
+    //alignItems: "center",
+    padding: 25,
     backgroundColor: "#f8f9fa",
   },
   logo: {
@@ -400,7 +425,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
     color: "#333",
@@ -455,6 +480,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+  resets: {
+    position:"absolute",
+    top: 20,
+    right:10,
+    backgroundColor:"None"
+  },
+  label: {
+    fontSize: 20,
+    marginBottom: 5
+  },
+  containerImage: {
+    display: "flex",
+    alignItems:"center",
+    justifyContent:"space-evenly",
+    margin: 10
+  },
+  modal:{
+    position:"relative"
+  }
 });
 
 export default FactureScreen;
