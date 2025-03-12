@@ -28,7 +28,6 @@ const FactureScreen = () => {
   const [adressRecipient, setAdressRecipient] = useState("Hz5wAtoNTA1fqHZkvZYufzNso4xwZXXCRMhYQnrwzxCx");
   const [adressSender, setAdressSender] = useState("7qfzthjwoh4hDk5ZhFARMDXEpkCDtCVkmrpG4iWU2pP4");
   const [transactionModalVisible, setTransactionModalVisible] = useState(false);
-  const [isPayer, setIsPayer] = useState(false)
   const [outputFacture, setOutpuFacture] = useState("")
   const [factureData, setFactureData] = useState({
     clientName: "",
@@ -50,8 +49,7 @@ const FactureScreen = () => {
 
       const dataFacture = await factureResponse.json();
       const dataClient = await clientResponse.json();
-
-      setOutpuFacture(dataFacture?.ds_F55INV?.output);
+      
       setFactureData({
         montantFacture:
           dataFacture?.ds_F55INV?.output?.[0]?.["F55INV.55TRINVA_SUM"] || "N/A",
@@ -268,13 +266,11 @@ const FactureScreen = () => {
 
   return (
     <View style={styles.container}>
-
-      <Image
-        source={require("@/assets/images/JirakaikyLogo.jpg")}
-        style={styles.logo}
-      />
-
-      <Text style={styles.title}>Rechercher une Facture</Text>
+      <Image 
+      source={require("@/assets/images/JirakaikyLogo.png")} 
+      style={{ width: 200, height: 150 }} 
+    />
+      <Text style={styles.title}>Rechercher une Facture  {montantTotal}</Text>
 
       {/* Champs de saisie */}
       <TextInput
