@@ -19,8 +19,8 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23528211520");
-  const [refFacture, setRefFacture] = useState("235210721202566");
+  const [refClient, setRefClient] = useState("23528220791");
+  const [refFacture, setRefFacture] = useState("235210721202262");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -273,7 +273,7 @@ const FactureScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style = {styles.containerImage}>
+      <View style={styles.containerImage}>
         <Image
           source={require("@/assets/images/JirakaikyLogo.png")}
           style={{ width: 200, height: 150 }}
@@ -358,14 +358,15 @@ const FactureScreen = () => {
             >
               Payer
             </Button>
-            <TouchableOpacity
+            <Button
+              mode="contained"
               onPress={() => {
                 setModalVisible(false);
               }}
               style={[styles.resets]}
             >
-              <Ionicons name= "close-circle-outline" size="40" color= "orange"/>
-            </TouchableOpacity>
+              <Ionicons name="close-circle-outline" size="20" color="orange" />
+            </Button>
           </View>
         </View>
       </Modal>
@@ -375,7 +376,9 @@ const FactureScreen = () => {
         visible={transactionModalVisible}
         transparent
         onRequestClose={() => setTransactionModalVisible(false)}
+        style={styles.modal}
       >
+        
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Ionicons name="wallet-outline" size={50} color="#007AFF" />
@@ -401,9 +404,10 @@ const FactureScreen = () => {
                 onPress={envoyerTransaction}
                 style={styles.button}
               >
-                <ion-icon name="close-circle-outline"></ion-icon>
+                Confirmer
               </Button>
             )}
+            
           </View>
         </View>
       </Modal>
@@ -481,24 +485,26 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   resets: {
-    position:"absolute",
+    position: "absolute",
     top: 20,
-    right:10,
-    backgroundColor:"None"
+    right: 10,
+    height: 50,
+    backgroundColor: "None",
+    fontWeight: "bold",
   },
   label: {
     fontSize: 20,
-    marginBottom: 5
+    marginBottom: 5,
   },
   containerImage: {
     display: "flex",
-    alignItems:"center",
-    justifyContent:"space-evenly",
-    margin: 10
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    margin: 10,
   },
-  modal:{
-    position:"relative"
-  }
+  modal: {
+    position: "relative",
+  },
 });
 
 export default FactureScreen;
