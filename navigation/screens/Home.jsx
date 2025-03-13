@@ -9,6 +9,8 @@ import EmptyWallet from "./HomeContent/EmptyWallet";
 import SellCrypto from "./HomeContent/SellCrypto";
 import BuyCrypto from "./HomeContent/BuyCrypto";
 import ConnectWallet from "../../Web3/ConnectWallet";
+import {TokenDisplay,getVkaAmount} from "@/Web3/GetTokenAccount";
+import TokensList from "@/Web3/TokensList";
 
 // Configuration des icônes du menu
 const MENU_ITEMS = [
@@ -36,12 +38,13 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
 
 // Composant principal Home
 const Home = () => {
+  // const amount = getVkaAmount();
   return (
     <ScrollView style={styles.container}>
       {/* 🔹 Solde total */}
       <Card style={styles.balanceCard}>
         <Card.Content style={styles.balanceContent}>
-          <Text style={styles.balanceText}>$27,852</Text>
+          <Text style={styles.balanceText}>$8558.45</Text>
           <FlatList
             data={MENU_ITEMS}
             keyExtractor={(item) => item.id}
@@ -56,7 +59,8 @@ const Home = () => {
       {/* 🔹 Connexion au Wallet */}
       <Card style={styles.sectionCard}>
         <Card.Content>
-          <ConnectWallet />
+          {/* <ConnectWallet /> */}
+          <TokensList />
         </Card.Content>
       </Card>
 
