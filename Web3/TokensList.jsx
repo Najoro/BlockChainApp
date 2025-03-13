@@ -4,7 +4,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from "uuid";
 import {Connection,clusterApiUrl} from "@solana/web3.js";
 import GetSolanaBalance from './GetSolanaBalance';
-import {TokenDisplay,TokendropDownDisplay} from "./GetTokenAccount";
+import {TokenDisplay,TokenVkaDisplay} from "./GetTokenAccount";
 
 import { Buffer } from "buffer";
 global.Buffer = Buffer;
@@ -17,7 +17,7 @@ const TokensList = () => {
     <View>
       <View>
         <Text style={styles.title}>Token associé</Text>
-        <TokenDisplay/>
+        <TokenVkaDisplay/>
       </View>
     </View>
   )

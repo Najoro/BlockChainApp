@@ -18,6 +18,14 @@ global.Buffer = Buffer;
 // Adresse du programme Metaplex Token Metadata
 const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
+//token Volanaka
+const cpg = {
+  tokenAddress : "cpgD4qYv9Aap6TazfGsCt5Qk4RxD4FGjryGDuh6eyEE",
+  name : "Volanaka",
+  symbole : "Vka",
+  url : "",
+}
+
 const fetchTokens = async (connection=cn, publicKey=pk) => {
   try {
     const tokenAccounts = await connection.getTokenAccountsByOwner(
@@ -139,6 +147,48 @@ const TokendropDownDisplay = ({ connection=cn, publicKey=pk }) =>{
     </View>
   );
 }
+/**VOLANAKA --------------------------------------------------------------------------- */
+const TokenVkaDisplay = ({ connection = cn, publicKey = pk }) => {
+  const navigation = useNavigation();
+  const tokens = GetTokenAccount({ connection, publicKey });
+  return (
+    <View>
+      {tokens.length === 0 ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : (
+        tokens.map((token, index) => (
+          (token.mintAddress == cpg.tokenAddress && (
+            <TouchableOpacity
+            key={index}
+            onPress={() =>
+              navigation.navigate("Envoyer", { token: token.mintAddress })
+            }
+            >
+            <ImageTextCard
+              imageSource={{ uri: token.image }}
+              // title={token.name}
+              // description={token.amount}
+              title={cpg.name}
+              description={token.amount +" "+cpg.symbole}
+              />
+          </TouchableOpacity>
+          ))
+        ))
+      )}
+    </View>
+  );
+};
 
+const getVkaAmount = ({ connection =cn, publicKey = pk }) => {
+  const tokens = GetTokenAccount({ connection, publicKey });
+  const [amount,setAmount] = useState(0);
+  tokens.map(token =>{
+    if(token.mintAddress = cpg.token){
+      setAmount(token.amount);
+    }
+  })
 
-export { GetTokenAccount, TokenDisplay,TokendropDownDisplay };
+  return `${amount} ${cpg.symbole}`;
+}
+
+export { GetTokenAccount, TokenDisplay,TokendropDownDisplay, TokenVkaDisplay,getVkaAmount };
