@@ -19,8 +19,8 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23528211520");
-  const [refFacture, setRefFacture] = useState("235210721202566");
+  const [refClient, setRefClient] = useState("23528100454");
+  const [refFacture, setRefFacture] = useState("235210721194938");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     alignItems:"flex-start",
     justifyContent: "flex-start",
     marginLeft: -20
-  }
+  }, 
 });
 
 export default FactureScreen;
