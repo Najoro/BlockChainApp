@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     marginTop: 10,
-    gap: 10, // Ajoute un espacement entre les boutons
+    gap: 10,
   },
   button: {
     borderRadius: 8,

@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, marginBottom: 8, color: '#333' },
   picker: { height: 50, marginBottom: 20 },
   input: { marginBottom: 20 },
-  button: { borderRadius: 8, paddingVertical: 8, marginTop: 10 },
+  button: { borderRadius: 30, paddingVertical: 8, marginTop: 10 },
   buttonText: { fontSize: 16 },
 });
 
