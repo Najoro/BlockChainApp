@@ -146,7 +146,9 @@ const FactureScreen = () => {
       setLoading(false);
     }
   };
+
   const fetchTransfer = async () => {
+    await fetchFactureData();
     const transferAPI = "https://preprod-vka2.eqima.org/wallet/transfer";
     const body = {
       senderAddress: adressSender,
@@ -154,7 +156,7 @@ const FactureScreen = () => {
       amount: montantTotal,
       senderKey: SOLANA_WALLET_PRIVATE_KEY,
     };
-
+    console.log("Montant total : ",montantTotal)
     console.log("Test transfer - Sender Address:", body.amount);
 
     try {
@@ -178,11 +180,13 @@ const FactureScreen = () => {
 
   const envoyerTransaction = async () => {
     setLoading(true);
-
+    await fetchTransfer();
     try {
-      const resultTransfer = await fetchTransfer();
-      const signature = resultTransfer.signature;
-      if (signature != undefined) {
+      //const resultTransfer = await fetchTransfer();
+      //const signature = resultTransfer.signature;
+      console.log("test montant", montantTotal);
+      const signature = "test"
+      if (signature != "test") {
         const URI = `https://preprod.api.cashless.eqima.org/api/paiement_facture/setRefTransaction?reftransaction=${signature}&idPaiement=${idPaiement}`;
         const setRef = await fetch(URI);
 
@@ -350,14 +354,17 @@ const FactureScreen = () => {
                 <Text style={styles.bold}>Status :</Text> Non Payé
               </Text>
             </View>
-
-            <Button
-              mode="contained"
-              onPress={initialisePaiement}
-              style={styles.button}
-            >
-              Payer
-            </Button>
+            {loading ? (
+              <ActivityIndicator size="large" color="#007AFF" />
+            ) : (
+                  <Button
+                    mode="contained"
+                    onPress={initialisePaiement}
+                    style={styles.button}
+                  >
+                    Payer
+                  </Button>
+            )}
             <Button
               mode="contained"
               onPress={() => {
