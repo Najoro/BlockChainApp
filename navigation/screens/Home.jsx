@@ -9,8 +9,9 @@ import EmptyWallet from "./HomeContent/EmptyWallet";
 import SellCrypto from "./HomeContent/SellCrypto";
 import BuyCrypto from "./HomeContent/BuyCrypto";
 import ConnectWallet from "../../Web3/ConnectWallet";
-import {TokenDisplay,getVkaAmount} from "@/Web3/GetTokenAccount";
+import {TokenWithoutVkaDisplay,getVkaAmount} from "@/Web3/GetTokenAccount";
 import TokensList from "@/Web3/TokensList";
+import {CPG} from "@/app.config";
 
 // Configuration des icônes du menu
 const MENU_ITEMS = [
@@ -38,13 +39,16 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
 
 // Composant principal Home
 const Home = () => {
-  // const amount = getVkaAmount();
+  const amount = getVkaAmount();
   return (
     <ScrollView style={styles.container}>
       {/* 🔹 Solde total */}
       <Card style={styles.balanceCard}>
         <Card.Content style={styles.balanceContent}>
-          <Text style={styles.balanceText}>$8558.45</Text>
+          <View style={styles.containerBalance}>
+            <Text style={styles.balanceText}>{amount}</Text>
+            <Text style={styles.symbole}>{CPG.symbole}</Text>
+          </View>
           <FlatList
             data={MENU_ITEMS}
             keyExtractor={(item) => item.id}
@@ -60,7 +64,7 @@ const Home = () => {
       <Card style={styles.sectionCard}>
         <Card.Content>
           {/* <ConnectWallet /> */}
-          <TokensList />
+          <TokenWithoutVkaDisplay />
         </Card.Content>
       </Card>
 
@@ -84,10 +88,22 @@ const styles = StyleSheet.create({
   balanceContent: {
     alignItems: "center",
   },
+  containerBalance : {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+  },
+  symbole : {
+    fontWeight: "semibold",
+    fontSize: 16,
+    color:"#fff",
+  },
   balanceText: {
-    fontSize: 45,
+    fontSize: 30,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#ffe",
     marginBottom: 15,
   },
   menuContainer: {

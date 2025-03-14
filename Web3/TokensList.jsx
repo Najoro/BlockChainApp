@@ -4,7 +4,7 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from "uuid";
 import {Connection,clusterApiUrl} from "@solana/web3.js";
 import GetSolanaBalance from './GetSolanaBalance';
-import {TokenDisplay,TokenVkaDisplay} from "./GetTokenAccount";
+import {TokenDisplay,TokenVkaDisplay,TokenWithoutVkaDisplay,} from "./GetTokenAccount";
 
 import { Buffer } from "buffer";
 global.Buffer = Buffer;
@@ -13,11 +13,12 @@ global.Buffer = Buffer;
 // const pubkey = SOLANA_WALLET_PUBLIC_KEY;
 
 const TokensList = () => {
-  return (
+    return (
     <View>
       <View>
         <Text style={styles.title}>Token associé</Text>
         <TokenVkaDisplay/>
+        <TokenWithoutVkaDisplay/>
       </View>
     </View>
   )

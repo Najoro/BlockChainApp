@@ -19,8 +19,8 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23528211520");
-  const [refFacture, setRefFacture] = useState("235210721202566");
+  const [refClient, setRefClient] = useState("23528220791");
+  const [refFacture, setRefFacture] = useState("235210721202262");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -273,7 +273,7 @@ const FactureScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style = {styles.containerImage}>
+      <View style={styles.containerImage}>
         <Image
           source={require("@/assets/images/JirakaikyLogo.png")}
           style={{ width: 200, height: 150 }}
@@ -365,7 +365,7 @@ const FactureScreen = () => {
               }}
               style={[styles.resets]}
             >
-              <Ionicons name= "close-circle-outline" size="25" color= "#007AFF"/>
+              <Ionicons name="close-circle-outline" size="20" color="orange" />
             </Button>
           </View>
         </View>
@@ -376,24 +376,25 @@ const FactureScreen = () => {
         visible={transactionModalVisible}
         transparent
         onRequestClose={() => setTransactionModalVisible(false)}
+        style={styles.modal}
       >
+        
         <View style={styles.modalBackground}>
           <View style={styles.modalContent}>
             <Ionicons name="wallet-outline" size={50} color="#007AFF" />
             <Text style={styles.modalTitle}>Confirmer la Transaction</Text>
-            <View style = {styles.modalContainer}>
-              <Text style={styles.infoText}>
-                Montant total : {montantTotal + 100} Ar
-              </Text>
-              <Text style={styles.infoText}>Payer avec : VOLANAKA</Text>
 
-              <TextInput
-                style={[styles.input, { display: "none" }]}
-                placeholder="Adresse du destinataire"
-                value={adressRecipient}
-                onChangeText={setAdressRecipient}
-              />
-            </View>
+            <Text style={styles.infoText}>
+              Montant total : {montantTotal + 100} Ar
+            </Text>
+            <Text style={styles.infoText}>Payer avec : VOLANAKA</Text>
+
+            <TextInput
+              style={[styles.input, { display: "none" }]}
+              placeholder="Adresse du destinataire"
+              value={adressRecipient}
+              onChangeText={setAdressRecipient}
+            />
 
             {loading ? (
               <ActivityIndicator size="large" color="#007AFF" />
@@ -406,15 +407,7 @@ const FactureScreen = () => {
                 Confirmer
               </Button>
             )}
-            <Button
-              mode="contained"
-              onPress={() => {
-                setTransactionModalVisible(false);
-              }}
-              style={[styles.resets]}
-            >
-              <Ionicons name= "close-circle-outline" size="25" color= "#007AFF"/>
-            </Button>
+            
           </View>
         </View>
       </Modal>
@@ -453,9 +446,8 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    marginTop : 10,
-    borderRadius: 30,
-    padding:5,
+    padding: 10,
+    borderRadius: 8,
     backgroundColor: "#007AFF",
   },
   modalBackground: {
@@ -476,7 +468,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginVertical: 10,
-    color: "#007AFF",
+    color: "#333",
   },
   factureInfo: {
     alignItems: "flex-start",
@@ -484,7 +476,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   infoText: {
-    fontSize: 13,
+    fontSize: 16,
     color: "#555",
     marginVertical: 2,
   },
@@ -493,30 +485,26 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   resets: {
-    position:"absolute",
+    position: "absolute",
     top: 20,
-    right: 2,
-    backgroundColor:"None"
+    right: 10,
+    height: 50,
+    backgroundColor: "None",
+    fontWeight: "bold",
   },
   label: {
     fontSize: 20,
-    marginBottom: 5
+    marginBottom: 5,
   },
   containerImage: {
     display: "flex",
-    alignItems:"center",
-    justifyContent:"space-evenly",
-    margin: 10
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    margin: 10,
   },
-  modal:{
-    position:"relative"
+  modal: {
+    position: "relative",
   },
-  modalContainer: {
-    display: "flex",
-    alignItems:"flex-start",
-    justifyContent: "flex-start",
-    marginLeft: -20
-  }
 });
 
 export default FactureScreen;

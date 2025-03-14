@@ -6,8 +6,8 @@ import ImageTextCard from "@/navigation/screens/HomeContent/ImageTextCard";
 import { useNavigation } from "@react-navigation/native";
 import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import { Picker } from "@react-native-picker/picker";
-import {SOLANA_WALLET_PUBLIC_KEY, SOLANA_RPC_URL} from "@/app.config";
-import {Connection,clusterApiUrl} from "@solana/web3.js";
+import { SOLANA_WALLET_PUBLIC_KEY, SOLANA_RPC_URL, CPG } from "@/app.config";
+import { Connection, clusterApiUrl } from "@solana/web3.js";
 
 const cn = new Connection(SOLANA_RPC_URL);
 const pk = SOLANA_WALLET_PUBLIC_KEY;
@@ -16,17 +16,11 @@ import { Buffer } from "buffer";
 
 global.Buffer = Buffer;
 // Adresse du programme Metaplex Token Metadata
-const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
+const METADATA_PROGRAM_ID = new PublicKey(
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+);
 
-//token Volanaka
-const cpg = {
-  tokenAddress : "cpgD4qYv9Aap6TazfGsCt5Qk4RxD4FGjryGDuh6eyEE",
-  name : "Volanaka",
-  symbole : "Vka",
-  url : "",
-}
-
-const fetchTokens = async (connection=cn, publicKey=pk) => {
+const fetchTokens = async (connection = cn, publicKey = pk) => {
   try {
     const tokenAccounts = await connection.getTokenAccountsByOwner(
       new PublicKey(publicKey),
@@ -40,7 +34,7 @@ const fetchTokens = async (connection=cn, publicKey=pk) => {
         const accountData = AccountLayout.decode(tokenAccount.account.data);
         const mintAddress = new PublicKey(accountData.mint).toBase58();
         const amount = parseInt(accountData.amount) / 10 ** 9;
-        
+
         const metadata = await getTokenMetadata(connection, mintAddress);
         return {
           mintAddress,
@@ -59,7 +53,7 @@ const fetchTokens = async (connection=cn, publicKey=pk) => {
 };
 
 //get metadata
-async function getTokenMetadata(connection,tokenMintAddress) {
+async function getTokenMetadata(connection, tokenMintAddress) {
   try {
     const mintPublicKey = new PublicKey(tokenMintAddress);
 
@@ -80,14 +74,17 @@ async function getTokenMetadata(connection,tokenMintAddress) {
       const metadata = Metadata.deserialize(accountInfo.data)[0];
       console.log("Metadata :", metadata);
     } else {
-      console.log("Aucune metadata trouvée pour ce token.",  metadataPDA.toBase58());
+      console.log(
+        "Aucune metadata trouvée pour ce token.",
+        metadataPDA.toBase58()
+      );
     }
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées :", error);
   }
 }
 
-const GetTokenAccount = ({ connection=cn, publicKey=pk }) => {
+const GetTokenAccount = ({ connection = cn, publicKey = pk }) => {
   const [tokens, setTokens] = useState([]);
 
   useEffect(() => {
@@ -100,53 +97,47 @@ const GetTokenAccount = ({ connection=cn, publicKey=pk }) => {
   return tokens;
 };
 
-
-const TokenDisplay = ({ connection=cn, publicKey=pk }) => {
+const TokenDisplay = ({ connection = cn, publicKey = pk }) => {
   const navigation = useNavigation();
-  const tokens = GetTokenAccount({ connection, publicKey })
-
+  const tokens = GetTokenAccount({ connection, publicKey });
   return (
     <View>
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        tokens.map((token, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() =>
-              navigation.navigate("Envoyer", { token: token.mintAddress })
-            }
-          >
-            <ImageTextCard
-              imageSource={{ uri: token.image }}
-              title={token.name}
-              description={token.amount}
-            />
-          </TouchableOpacity>
+        tokens.map((token) => (
+          <EachRenderTokenDisplay token={token} isVka={false} />
         ))
       )}
     </View>
   );
 };
 
-const TokendropDownDisplay = ({ connection=cn, publicKey=pk }) =>{
-  const tokens = GetTokenAccount({connection,publicKey});
-  const [selectedValue, setSelectedValue] = useState('');
+const TokendropDownDisplay = ({ connection = cn, publicKey = pk }) => {
+  const tokens = GetTokenAccount({ connection, publicKey });
+  const [selectedValue, setSelectedValue] = useState("");
 
-  return(
+  return (
     <View>
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        <Picker selectedValue={selectedValue} onValueChange={(itemValue) => setSelectedValue(itemValue)}>
-         {tokens.map((token, index) => (
-          <Picker.Item key={index} label={token.mintAddress} value={token.mintAddress} />
-        ))}
-      </Picker>
+        <Picker
+          selectedValue={selectedValue}
+          onValueChange={(itemValue) => setSelectedValue(itemValue)}
+        >
+          {tokens.map((token, index) => (
+            <Picker.Item
+              key={index}
+              label={token.mintAddress}
+              value={token.mintAddress}
+            />
+          ))}
+        </Picker>
       )}
     </View>
   );
-}
+};
 /**VOLANAKA --------------------------------------------------------------------------- */
 const TokenVkaDisplay = ({ connection = cn, publicKey = pk }) => {
   const navigation = useNavigation();
@@ -156,39 +147,88 @@ const TokenVkaDisplay = ({ connection = cn, publicKey = pk }) => {
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        tokens.map((token, index) => (
-          (token.mintAddress == cpg.tokenAddress && (
-            <TouchableOpacity
-            key={index}
-            onPress={() =>
-              navigation.navigate("Envoyer", { token: token.mintAddress })
-            }
-            >
-            <ImageTextCard
-              imageSource={{ uri: token.image }}
-              // title={token.name}
-              // description={token.amount}
-              title={cpg.name}
-              description={token.amount +" "+cpg.symbole}
-              />
-          </TouchableOpacity>
-          ))
-        ))
+        tokens.map((token) =>
+            token.mintAddress == CPG.mintAddress && (
+              <EachRenderTokenDisplay isVka={true} token={token} />
+          )
+        )
       )}
     </View>
   );
 };
 
-const getVkaAmount = ({ connection =cn, publicKey = pk }) => {
+const TokenWithoutVkaDisplay = ({ connection = cn, publicKey = pk }) => {
+  const navigation = useNavigation();
   const tokens = GetTokenAccount({ connection, publicKey });
-  const [amount,setAmount] = useState(0);
-  tokens.map(token =>{
-    if(token.mintAddress = cpg.token){
-      setAmount(token.amount);
-    }
-  })
+  return (
+    <View>
+      {tokens.length === 0 ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : (
+        tokens.map((token) =>
+            token.mintAddress != CPG.mintAddress && (
+              <EachRenderTokenDisplay token={token} />
+          )
+        )
+      )}
+    </View>
+  );
+};
 
-  return `${amount} ${cpg.symbole}`;
-}
+const getVkaAmount = () => {
+  const tokens = GetTokenAccount(cn, pk);
+  const [vkaAmount, setVkaAmount] = useState(0);
+  useEffect(() => {
+    tokens.forEach((token) => {
+      if (token.mintAddress === CPG.mintAddress) {
+        setVkaAmount(token.amount);
+      }
+    });
+  }, [tokens, CPG]);
 
-export { GetTokenAccount, TokenDisplay,TokendropDownDisplay, TokenVkaDisplay,getVkaAmount };
+  return vkaAmount.toLocaleString("fr-FR");
+};
+
+
+/**FUNCTIONS ---------------------------------------------------------- */
+const EachRenderTokenDisplay = ({ token, isVka = false }) => {
+  const navigation = useNavigation();
+  const handelPress = () => {
+    navigation.navigate("Envoyer", { token: token.mintAddress });
+  };
+  return (
+    <>
+      {isVka ? (
+        <TouchableOpacity key={token.mintAddress} onPress={handelPress}>
+          <ImageTextCard
+            imageSource={{ uri: token.image }}
+            title={CPG.name}
+            description={token.amount + " " + CPG.symbole}
+          />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          key={token.mintAddress}
+          onPress={() =>
+            navigation.navigate("Envoyer", { token: token.mintAddress })
+          }
+        >
+          <ImageTextCard
+            imageSource={{ uri: token.image }}
+            title={token.name}
+            description={token.amount + " " + token.symbol}
+          />
+        </TouchableOpacity>
+      )}
+    </>
+  );
+};
+
+export {
+  GetTokenAccount,
+  TokenDisplay,
+  TokendropDownDisplay,
+  TokenVkaDisplay,
+  getVkaAmount,
+  TokenWithoutVkaDisplay,
+};
