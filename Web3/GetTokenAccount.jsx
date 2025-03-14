@@ -66,7 +66,7 @@ async function getTokenMetadata(connection, tokenMintAddress) {
       ],
       METADATA_PROGRAM_ID
     );
-    console.log("metadataPDA:", metadataPDA.toBase58());
+    // console.log("metadataPDA:", metadataPDA.toBase58());
 
     // Récupérer les informations du compte
     const accountInfo = await connection.getAccountInfo(metadataPDA);
@@ -74,10 +74,10 @@ async function getTokenMetadata(connection, tokenMintAddress) {
       const metadata = Metadata.deserialize(accountInfo.data)[0];
       console.log("Metadata :", metadata);
     } else {
-      console.log(
-        "Aucune metadata trouvée pour ce token.",
-        metadataPDA.toBase58()
-      );
+      // console.log(
+      //   "Aucune metadata trouvée pour ce token.",
+      //   metadataPDA.toBase58()
+      // );
     }
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées :", error);
