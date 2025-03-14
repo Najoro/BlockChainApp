@@ -5,6 +5,5 @@ export const CPG = {
     mintAddress : "cpgD4qYv9Aap6TazfGsCt5Qk4RxD4FGjryGDuh6eyEE",
     name : "Volanaka",
     symbole : "Vka",
-    symbole : "Vka",
     url : "",
   }
