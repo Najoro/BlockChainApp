@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
+import {SaveToSecureStore} from "@/services/SecureStore";
 
 const ImportPrivateKey = () => {
-  const [name, setName] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const navigation = useNavigation(); // Récupération de navigation
 
@@ -15,37 +14,18 @@ const ImportPrivateKey = () => {
     }
 
     try {
-      const keyToStore = typeof privateKey === "string" ? privateKey : JSON.stringify(privateKey);
-      console.log("Clé privée à stocker :", keyToStore);
-      
-      await SecureStore.setItemAsync("user_private_key", keyToStore, {
-        keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-      });
-
-      await getPrivateKey();
-      Alert.alert("Succès", "Clé privée enregistrée avec succès !");
-      setPrivateKey("");
-      setName("");
+      const key = await SaveToSecureStore("walletInfo",privateKey);
       navigation.navigate("Home");
+      console.log("Clé privée",key);
     } catch (e) {
       Alert.alert("Erreur", "Impossible d'enregistrer la clé privée.");
       console.error("Erreur de stockage de la clé privée :", e);
     }
   };
 
-  const getPrivateKey = async () => {
-    const key = await SecureStore.getItemAsync("user_private_key");
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Importer une clé privée</Text>
-      <TextInput 
-        placeholder="Nom" 
-        style={styles.input} 
-        value={name} 
-        onChangeText={setName} 
-      />
       <TextInput 
         placeholder="Clé privée" 
         style={styles.area} 
