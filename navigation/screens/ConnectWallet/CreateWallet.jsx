@@ -12,6 +12,7 @@ import * as SecureStore from "expo-secure-store";
 import * as ImagePicker from "expo-image-picker";
 import { Keypair } from "@solana/web3.js";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {GetFromSecureStore, SaveToSecureStore} from "@/services/SecureStore"
 
 const CreateWalletPage = ({ navigation }) => {
   const [wallet, setWallet] = useState(null);
@@ -21,6 +22,7 @@ const CreateWalletPage = ({ navigation }) => {
   const [walletName, setWalletName] = useState("");
   const [walletDescription, setWalletDescription] = useState("");
   const [image, setImage] = useState(null);
+  const [dataSecureStore, setdataSecureStore] = useState(null);
 
   // Fonction pour choisir une image
   const pickImage = async () => {
@@ -57,6 +59,9 @@ const CreateWalletPage = ({ navigation }) => {
       };
 
       setWallet(newWallet);
+      await SaveToSecureStore("walletInfo", newWallet);
+      const getInSS = await GetFromSecureStore("walletInfo");
+      setdataSecureStore(getInSS);
       Alert.alert("Succès", "Votre wallet a été créé avec succès !");
 
       // Envoyer les données du wallet à la page Home
@@ -70,8 +75,7 @@ const CreateWalletPage = ({ navigation }) => {
   const copyToClipboard = () => {
     Clipboard.setString(wallet.publicKey);
     Alert.alert("Copié", "Adresse publique copiée dans le presse-papier");
-  };
-
+  };  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Créer un Nouveau Wallet</Text>
@@ -100,26 +104,26 @@ const CreateWalletPage = ({ navigation }) => {
       </Button>
 
       {/* Affichage du Wallet */}
-      {wallet && (
+      {dataSecureStore && (
         <Card style={styles.walletCard}>
           <Card.Content>
             {wallet.image && (
               <Image
-                source={{ uri: wallet.image }}
+                source={{ uri: dataSecureStore.image }}
                 style={styles.imagePreview}
               />
             )}
             <Text style={styles.label}>
-              Nom du Wallet : {wallet.walletName}
+              Nom du Wallet : {dataSecureStore.walletName}
             </Text>
             <Text style={styles.label}>
-              Description : {wallet.walletDescription}
+              Description : {dataSecureStore.walletDescription}
             </Text>
-            <Text style={styles.label}>Prénom : {wallet.firstName}</Text>
-            <Text style={styles.label}>Nom : {wallet.lastName}</Text>
-            <Text style={styles.label}>CIN : {wallet.cin}</Text>
+            <Text style={styles.label}>Prénom : {dataSecureStore.firstName}</Text>
+            <Text style={styles.label}>Nom : {dataSecureStore.lastName}</Text>
+            <Text style={styles.label}>CIN : {dataSecureStore.cin}</Text>
             <Text style={styles.label}>Adresse Publique :</Text>
-            <Text style={styles.publicKey}>{wallet.publicKey}</Text>
+            <Text style={styles.publicKey}>{dataSecureStore.publicKey}</Text>
             <Button mode="text" onPress={copyToClipboard}>
               Copier l'adresse
             </Button>
