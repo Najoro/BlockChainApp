@@ -105,6 +105,7 @@ const FactureScreen = () => {
 
   const initialisePaiement = async () => {
     try {
+      const currentDate = new Date().toLocaleString();
       const { clientName, addressClient, montantFacture, mois, annee } =
         factureData;
 
@@ -121,6 +122,7 @@ const FactureScreen = () => {
             numeroPayeur: SOLANA_WALLET_PUBLIC_KEY,
             refFacture: refFacture,
             refClient: refClient,
+            datePaiement: currentDate,
             montantFacture: montantFacture,
             nomClient: clientName,
             adresseClient: addressClient,
