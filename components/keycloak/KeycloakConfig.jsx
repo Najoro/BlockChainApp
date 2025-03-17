@@ -1,7 +1,7 @@
 export const keycloakConfig = {
     issuer: "https://preprod.sso.eqima.org/realms/blockchain",
     clientId: "BlockchainApp",
-    redirectUrl: "myapp://callback",
+    redirectUrl: "exp://192.168.88.32:8081",
     scopes: ["openid", "profile", "email"],
     serviceConfiguration: {
       authorizationEndpoint:

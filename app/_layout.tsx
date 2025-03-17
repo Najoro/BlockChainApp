@@ -11,16 +11,33 @@ import Envoyer from "@/navigation/screens/MenuContent/Envoyer";
 import Home from "@/navigation/screens/Home";
 import History  from "@/navigation/screens/History";
 import Invoice from "@/navigation/screens/Invoice";
+import CreateWallet from "../navigation/screens/ConnectWallet/CreateWallet";
+import ImportPrivateKey from "../navigation/screens/ConnectWallet/ImportPrivateKey";
+import walletLogin  from "../navigation/screens/ConnectWallet/walletLogin";
+import SecurePayment from "@/navigation/screens/SecurePayment"
+import TokensList from "@/Web3/TokensList";
+import ScanCodeQr from "@/components/ScanCodeQr"
+
+
 const Stack = createStackNavigator();
 
 export default function RootLayout() {
   return (
     <>
-        <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown : true}}>
+        <Stack.Navigator initialRouteName="walletLogin" screenOptions={{headerShown : false}}>
           <Stack.Screen name="Login" component={Auth} />
-          <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/> 
-          <Stack.Screen name="Recevoir" component={Recevoir} />
-          <Stack.Screen name="Envoyer" component={Envoyer} />
+          <Stack.Screen name="CreateWallet" component={CreateWallet} />
+          <Stack.Screen name="ImportPrivateKey" component={ImportPrivateKey} options={{headerShown: true, title:"Importer la clé privée"}} />
+          <Stack.Screen name="walletLogin" component={walletLogin} />
+          <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/>
+          <Stack.Screen name="securePayement" component={SecurePayment} options={{headerShown: true, title:"QR code"}} />
+          
+          <Stack.Screen name="Recevoir" component={Recevoir}  />
+          <Stack.Screen name="ScanCodeQr" component={ScanCodeQr} options={{headerShown: true, title:"QR code"}} />
+
+          <Stack.Screen name="Envoyer" component={Envoyer} options={{headerShown: true,}}/>
+          <Stack.Screen name="tokensList" component={TokensList} options={{headerShown: true, title : "Liste des tokens"}}/>
+
           <Stack.Screen name="Echanger" component={Echanger} />
           <Stack.Screen name="Encaisser" component={Encaisser} />
         </Stack.Navigator>
