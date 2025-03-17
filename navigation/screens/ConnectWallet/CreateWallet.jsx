@@ -104,32 +104,7 @@ const CreateWalletPage = ({ navigation }) => {
       </Button>
 
       {/* Affichage du Wallet */}
-      {dataSecureStore && (
-        <Card style={styles.walletCard}>
-          <Card.Content>
-            {wallet.image && (
-              <Image
-                source={{ uri: dataSecureStore.image }}
-                style={styles.imagePreview}
-              />
-            )}
-            <Text style={styles.label}>
-              Nom du Wallet : {dataSecureStore.walletName}
-            </Text>
-            <Text style={styles.label}>
-              Description : {dataSecureStore.walletDescription}
-            </Text>
-            <Text style={styles.label}>Prénom : {dataSecureStore.firstName}</Text>
-            <Text style={styles.label}>Nom : {dataSecureStore.lastName}</Text>
-            <Text style={styles.label}>CIN : {dataSecureStore.cin}</Text>
-            <Text style={styles.label}>Adresse Publique :</Text>
-            <Text style={styles.publicKey}>{dataSecureStore.publicKey}</Text>
-            <Button mode="text" onPress={copyToClipboard}>
-              Copier l'adresse
-            </Button>
-          </Card.Content>
-        </Card>
-      )}
+      
 
       <Button
         mode="outlined"
