@@ -26,7 +26,7 @@ const ImportPrivateKey = () => {
       Alert.alert("Succès", "Clé privée enregistrée avec succès !");
       setPrivateKey("");
       setName("");
-      navigation.navigate("Home", { privateKey: privateKey });
+      navigation.navigate("Home");
     } catch (e) {
       Alert.alert("Erreur", "Impossible d'enregistrer la clé privée.");
       console.error("Erreur de stockage de la clé privée :", e);
