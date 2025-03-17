@@ -149,7 +149,7 @@ const TokenVkaDisplay = ({ connection = cn, publicKey = pk }) => {
       ) : (
         tokens.map((token,index) =>
             token.mintAddress == CPG.mintAddress && (
-              <EachRenderTokenDisplay index={index} isVka={true} token={token} />
+              <EachRenderTokenDisplay  key={token.mintAddress || index} index={index} isVka={true} token={token} />
           )
         )
       )}
