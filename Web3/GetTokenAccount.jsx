@@ -66,7 +66,7 @@ async function getTokenMetadata(connection, tokenMintAddress) {
       ],
       METADATA_PROGRAM_ID
     );
-    console.log("metadataPDA:", metadataPDA.toBase58());
+    // console.log("metadataPDA:", metadataPDA.toBase58());
 
     // Récupérer les informations du compte
     const accountInfo = await connection.getAccountInfo(metadataPDA);
@@ -74,10 +74,10 @@ async function getTokenMetadata(connection, tokenMintAddress) {
       const metadata = Metadata.deserialize(accountInfo.data)[0];
       console.log("Metadata :", metadata);
     } else {
-      console.log(
-        "Aucune metadata trouvée pour ce token.",
-        metadataPDA.toBase58()
-      );
+      // console.log(
+      //   "Aucune metadata trouvée pour ce token.",
+      //   metadataPDA.toBase58()
+      // );
     }
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées :", error);
@@ -105,8 +105,8 @@ const TokenDisplay = ({ connection = cn, publicKey = pk }) => {
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        tokens.map((token) => (
-          <EachRenderTokenDisplay token={token} isVka={false} />
+        tokens.map((token, index) => (
+          <EachRenderTokenDisplay index={index} token={token} isVka={false} />
         ))
       )}
     </View>
@@ -147,9 +147,9 @@ const TokenVkaDisplay = ({ connection = cn, publicKey = pk }) => {
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        tokens.map((token) =>
+        tokens.map((token,index) =>
             token.mintAddress == CPG.mintAddress && (
-              <EachRenderTokenDisplay isVka={true} token={token} />
+              <EachRenderTokenDisplay  key={token.mintAddress || index} index={index} isVka={true} token={token} />
           )
         )
       )}
@@ -165,9 +165,9 @@ const TokenWithoutVkaDisplay = ({ connection = cn, publicKey = pk }) => {
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        tokens.map((token) =>
+        tokens.map((token, index) =>
             token.mintAddress != CPG.mintAddress && (
-              <EachRenderTokenDisplay token={token} />
+              <EachRenderTokenDisplay key={token.mintAddress || index} index={index} token={token} />
           )
         )
       )}
@@ -191,7 +191,7 @@ const getVkaAmount = () => {
 
 
 /**FUNCTIONS ---------------------------------------------------------- */
-const EachRenderTokenDisplay = ({ token, isVka = false }) => {
+const EachRenderTokenDisplay = ({ token, index, isVka = false }) => {
   const navigation = useNavigation();
   const handelPress = () => {
     navigation.navigate("Envoyer", { token: token.mintAddress });
@@ -199,7 +199,7 @@ const EachRenderTokenDisplay = ({ token, isVka = false }) => {
   return (
     <>
       {isVka ? (
-        <TouchableOpacity key={token.mintAddress} onPress={handelPress}>
+        <TouchableOpacity key={index} onPress={handelPress}>
           <ImageTextCard
             imageSource={{ uri: token.image }}
             title={CPG.name}
@@ -207,12 +207,7 @@ const EachRenderTokenDisplay = ({ token, isVka = false }) => {
           />
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity
-          key={token.mintAddress}
-          onPress={() =>
-            navigation.navigate("Envoyer", { token: token.mintAddress })
-          }
-        >
+        <TouchableOpacity key={index} onPress={handelPress}>
           <ImageTextCard
             imageSource={{ uri: token.image }}
             title={token.name}

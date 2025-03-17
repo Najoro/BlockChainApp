@@ -1,13 +1,40 @@
-import React, { useState } from 'react';
-import { View, Alert, StyleSheet, Clipboard } from 'react-native';
-import { TextInput, Button, Text, Card } from 'react-native-paper';
-import * as SecureStore from 'expo-secure-store';
-import { Keypair } from '@solana/web3.js';
+import React, { useState } from "react";
+import {
+  View,
+  Alert,
+  StyleSheet,
+  Clipboard,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { TextInput, Button, Text, Card } from "react-native-paper";
+import * as SecureStore from "expo-secure-store";
+import * as ImagePicker from "expo-image-picker";
+import { Keypair } from "@solana/web3.js";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const CreateWalletPage = ({ navigation }) => {
   const [wallet, setWallet] = useState(null);
-  const [walletName, setWalletName] = useState('');
-  const [walletDescription, setWalletDescription] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [cin, setCin] = useState("");
+  const [walletName, setWalletName] = useState("");
+  const [walletDescription, setWalletDescription] = useState("");
+  const [image, setImage] = useState(null);
+
+  // Fonction pour choisir une image
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   const createWallet = async () => {
     try {
@@ -18,51 +45,56 @@ const CreateWalletPage = ({ navigation }) => {
       // Sauvegarde sécurisée de la clé privée
       await SecureStore.setItemAsync(publicKey, secretKey);
 
-      const newWallet = { 
-        name: walletName, 
-        description: walletDescription, 
-        publicKey, 
-        secretKey 
+      const newWallet = {
+        firstName,
+        lastName,
+        cin,
+        walletName,
+        walletDescription,
+        publicKey,
+        secretKey,
+        image,
       };
 
       setWallet(newWallet);
-      Alert.alert('Succès', 'Votre wallet a été créé avec succès !');
+      Alert.alert("Succès", "Votre wallet a été créé avec succès !");
 
       // Envoyer les données du wallet à la page Home
-      navigation.navigate('Home', { wallet: newWallet });
-
+      navigation.navigate("Home", { wallet: newWallet });
     } catch (error) {
-      Alert.alert('Erreur', 'Échec de la création du wallet');
+      Alert.alert("Erreur", "Échec de la création du wallet");
       console.error(error);
     }
   };
 
   const copyToClipboard = () => {
     Clipboard.setString(wallet.publicKey);
-    Alert.alert('Copié', 'Adresse publique copiée dans le presse-papier');
+    Alert.alert("Copié", "Adresse publique copiée dans le presse-papier");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Créer un Nouveau Wallet</Text>
 
-      {/* Formulaire */}
-      <TextInput
-        label="Nom du Wallet"
-        value={walletName}
-        onChangeText={setWalletName}
-        mode="outlined"
-        style={styles.input}
-      />
-      <TextInput
-        label="Description"
-        value={walletDescription}
-        onChangeText={setWalletDescription}
-        mode="outlined"
-        style={styles.input}
-        multiline
-      />
+      {/* Image sélectionnée */}
+      <View style={styles.containerImages}>
+        {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+        ) : (
+          <Image source={require("../../../assets/images/profil.png")} style={styles.image} />
+        )}
+        <TouchableOpacity style={styles.changeImage} onPress={pickImage}>
+            <Ionicons name="pencil-outline" size={24} color="white" />
+          </TouchableOpacity>
+      </View>
 
+      {/* Formulaire */}
+      <TextInput label="Prénom" value={firstName} onChangeText={setFirstName} mode="outlined" style={styles.input} />
+      <TextInput label="Nom" value={lastName} onChangeText={setLastName} mode="outlined" style={styles.input} />
+      <TextInput label="CIN" value={cin} onChangeText={setCin} mode="outlined" style={styles.input} />
+      <TextInput label="Nom du Wallet" value={walletName} onChangeText={setWalletName} mode="outlined" style={styles.input} />
+      <TextInput label="Description du Wallet" value={walletDescription} onChangeText={setWalletDescription} mode="outlined" style={styles.input} multiline />
+      
       <Button mode="contained" onPress={createWallet} style={styles.button}>
         Générer un Wallet
       </Button>
@@ -71,8 +103,21 @@ const CreateWalletPage = ({ navigation }) => {
       {wallet && (
         <Card style={styles.walletCard}>
           <Card.Content>
-            <Text style={styles.label}>Nom : {wallet.name}</Text>
-            <Text style={styles.label}>Description : {wallet.description}</Text>
+            {wallet.image && (
+              <Image
+                source={{ uri: wallet.image }}
+                style={styles.imagePreview}
+              />
+            )}
+            <Text style={styles.label}>
+              Nom du Wallet : {wallet.walletName}
+            </Text>
+            <Text style={styles.label}>
+              Description : {wallet.walletDescription}
+            </Text>
+            <Text style={styles.label}>Prénom : {wallet.firstName}</Text>
+            <Text style={styles.label}>Nom : {wallet.lastName}</Text>
+            <Text style={styles.label}>CIN : {wallet.cin}</Text>
             <Text style={styles.label}>Adresse Publique :</Text>
             <Text style={styles.publicKey}>{wallet.publicKey}</Text>
             <Button mode="text" onPress={copyToClipboard}>
@@ -82,7 +127,11 @@ const CreateWalletPage = ({ navigation }) => {
         </Card>
       )}
 
-      <Button mode="outlined" onPress={() => navigation.navigate('Home')} style={styles.button}>
+      <Button
+        mode="outlined"
+        onPress={() => navigation.navigate("Home")}
+        style={styles.button}
+      >
         Aller à l'Accueil
       </Button>
     </View>
@@ -92,14 +141,14 @@ const CreateWalletPage = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 20,
   },
   input: {
@@ -111,17 +160,57 @@ const styles = StyleSheet.create({
   walletCard: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   publicKey: {
     fontSize: 14,
-    color: 'blue',
+    color: "blue",
+    marginBottom: 10,
+  },
+  containerImages: {
+    position: "relative",
+    alignSelf: "center",
+  },
+  changeImage: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    backgroundColor: "#500073",
+    padding: 6,
+    borderRadius: 15,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  imagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#ddd",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  imageText: {
+    fontSize: 14,
+    color: "#555",
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: "center",
     marginBottom: 10,
   },
 });
