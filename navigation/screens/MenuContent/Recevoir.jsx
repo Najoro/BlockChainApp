@@ -4,6 +4,7 @@ import QRCode from "react-native-qrcode-svg";
 import DropdownComponent from "../../../components/DropdownComponent ";
 // import Clipboard  from "@react-native-clipboard/clipboard";
 import {SOLANA_WALLET_PUBLIC_KEY} from "@/app.config";
+import {pkSecureStore} from '@/Web3/WaletSecureStore';
 
 import { Buffer } from "buffer";
 global.Buffer = Buffer;
@@ -11,7 +12,8 @@ global.Buffer = Buffer;
 const pubkey = SOLANA_WALLET_PUBLIC_KEY;
 
 function Recevoir() {
-  const walletAddress = pubkey;
+  const pkSs = pkSecureStore();
+  const walletAddress = pkSs;
  
   const handleClick = () => {
     alert("Copier");
