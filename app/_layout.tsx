@@ -26,8 +26,8 @@ export default function RootLayout() {
     <>
         <Stack.Navigator initialRouteName="walletLogin" screenOptions={{headerShown : false}}>
           <Stack.Screen name="Login" component={Auth} />
-          <Stack.Screen name="CreateWallet" component={CreateWallet} />
-          <Stack.Screen name="ImportPrivateKey" component={ImportPrivateKey} />
+          <Stack.Screen name="CreateWallet" component={CreateWallet}  />
+          <Stack.Screen name="ImportPrivateKey" component={ImportPrivateKey} options={{headerShown: true, title:"Importer une clé privée"}} />
           <Stack.Screen name="walletLogin" component={walletLogin} />
           <Stack.Screen name="Home" component={MainNavigations}  options={{headerShown : false}}/>
           <Stack.Screen name="securePayement" component={SecurePayment} options={{headerShown: true, title:"QR code"}} />
