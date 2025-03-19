@@ -1,16 +1,10 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigation } from "@react-navigation/native";
 import { View, ScrollView, StyleSheet, FlatList } from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import { Feather, FontAwesome } from "@expo/vector-icons";
-import TabsView from "@/components/functions/TabsView";
-import MyWallet from "./HomeContent/MyWallet";
-import EmptyWallet from "./HomeContent/EmptyWallet";
-import SellCrypto from "./HomeContent/SellCrypto";
-import BuyCrypto from "./HomeContent/BuyCrypto";
-import ConnectWallet from "../../Web3/ConnectWallet";
 import {TokenWithoutVkaDisplay,getVkaAmount} from "@/Web3/GetTokenAccount";
-import TokensList from "@/Web3/TokensList";
+import {GetFromSecureStore} from "@/services/SecureStore"
 import {CPG} from "@/app.config";
 
 // Configuration des icônes du menu
@@ -40,6 +34,18 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
 // Composant principal Home
 const Home = () => {
   const amount = getVkaAmount();
+  const [privateKey, setPrivateKey] = useState(null);
+  useEffect(() => {
+    const fetchData = async () =>{
+      const data = await GetFromSecureStore("walletInfo");
+      if(data){
+        setPrivateKey(data);
+      }else{
+        setPrivateKey("Aucun clé privée importer")
+      }
+    }
+     fetchData();
+  })
   return (
     <ScrollView style={styles.container}>
       {/* 🔹 Solde total */}
@@ -48,6 +54,7 @@ const Home = () => {
           <View style={styles.containerBalance}>
             <Text style={styles.balanceText}>{amount}</Text>
             <Text style={styles.symbole}>{CPG.symbole}</Text>
+            <Text> Clé :{privateKey}</Text>
           </View>
           <FlatList
             data={MENU_ITEMS}
