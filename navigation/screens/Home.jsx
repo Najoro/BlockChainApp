@@ -1,18 +1,49 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, ScrollView, StyleSheet, FlatList } from "react-native";
+import { View, ScrollView, StyleSheet, FlatList, Alert } from "react-native";
 import { Text, Card, Button } from "react-native-paper";
 import { Feather, FontAwesome } from "@expo/vector-icons";
-import {TokenWithoutVkaDisplay,getVkaAmount} from "@/Web3/GetTokenAccount";
-import {GetFromSecureStore} from "@/services/SecureStore"
-import {CPG} from "@/app.config";
+import TabsView from "@/components/functions/TabsView";
+import MyWallet from "./HomeContent/MyWallet";
+import EmptyWallet from "./HomeContent/EmptyWallet";
+import SellCrypto from "./HomeContent/SellCrypto";
+import BuyCrypto from "./HomeContent/BuyCrypto";
+import ConnectWallet from "../../Web3/ConnectWallet";
+import { TokenWithoutVkaDisplay, getVkaAmount } from "@/Web3/GetTokenAccount";
+import { GetFromSecureStore } from "@/services/SecureStore";
+import TokensList from "@/Web3/TokensList";
+import { CPG } from "@/app.config";
 
 // Configuration des icônes du menu
 const MENU_ITEMS = [
-  { id: "1", iconLibrary: Feather, iconName: "arrow-down-left", label: "Recevoir", screen: "Recevoir" },
-  { id: "2", iconLibrary: Feather, iconName: "arrow-up-right", label: "Envoyer", screen: "tokensList" },
-  { id: "3", iconLibrary: Feather, iconName: "refresh-cw", label: "Échanger", screen: "Echanger" },
-  { id: "4", iconLibrary: FontAwesome, iconName: "money", label: "Encaisser", screen: "Encaisser" },
+  {
+    id: "1",
+    iconLibrary: Feather,
+    iconName: "arrow-down-left",
+    label: "Recevoir",
+    screen: "Recevoir",
+  },
+  {
+    id: "2",
+    iconLibrary: Feather,
+    iconName: "arrow-up-right",
+    label: "Envoyer",
+    screen: "tokensList",
+  },
+  {
+    id: "3",
+    iconLibrary: Feather,
+    iconName: "refresh-cw",
+    label: "Échanger",
+    screen: "Echanger",
+  },
+  {
+    id: "4",
+    iconLibrary: FontAwesome,
+    iconName: "money",
+    label: "Encaisser",
+    screen: "Encaisser",
+  },
 ];
 
 // Composant réutilisable pour une icône de menu
@@ -21,7 +52,9 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
   return (
     <Button
       mode="contained"
-      icon={({ size, color }) => <IconLibrary name={iconName} size={size} color={color} />}
+      icon={({ size, color }) => (
+        <IconLibrary name={iconName} size={size} color={color} />
+      )}
       onPress={() => navigation.navigate(screen)}
       style={styles.menuButton}
       labelStyle={styles.menuLabel}
@@ -35,17 +68,22 @@ const MenuIcon = ({ iconLibrary: IconLibrary, iconName, label, screen }) => {
 const Home = () => {
   const amount = getVkaAmount();
   const [privateKey, setPrivateKey] = useState(null);
-  useEffect(() => {
-    const fetchData = async () =>{
-      const data = await GetFromSecureStore("walletInfo");
-      if(data){
-        setPrivateKey(data);
-      }else{
-        setPrivateKey("Aucun clé privée importer")
-      }
-    }
-     fetchData();
-  })
+  try {
+    useEffect(() => {
+      const fetchData = async () => {
+        const data = await GetFromSecureStore("walletInfo");
+        if (data) {
+          setPrivateKey(data);
+        } else {
+          setPrivateKey("Aucune clé privée importée");
+        }
+      };
+      fetchData();
+    }, []);
+  } catch (e) {
+    Alert.alert("Erreur lors de la récupération de la clé privée", e);
+  }
+
   return (
     <ScrollView style={styles.container}>
       {/* 🔹 Solde total */}
@@ -74,7 +112,6 @@ const Home = () => {
           <TokenWithoutVkaDisplay />
         </Card.Content>
       </Card>
-
     </ScrollView>
   );
 };
@@ -95,17 +132,17 @@ const styles = StyleSheet.create({
   balanceContent: {
     alignItems: "center",
   },
-  containerBalance : {
+  containerBalance: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
   },
-  symbole : {
+  symbole: {
     fontWeight: "semibold",
     fontSize: 16,
-    color:"#fff",
+    color: "#fff",
   },
   balanceText: {
     fontSize: 30,
