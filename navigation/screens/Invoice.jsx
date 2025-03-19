@@ -19,8 +19,8 @@ import {
 import { Button } from "react-native-paper";
 
 const FactureScreen = () => {
-  const [refClient, setRefClient] = useState("23528220791");
-  const [refFacture, setRefFacture] = useState("235210721202262");
+  const [refClient, setRefClient] = useState("23528100454");
+  const [refFacture, setRefFacture] = useState("235210721194938");
   const [modalVisible, setModalVisible] = useState(false);
   const [idPaiement, setIdPaiement] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -105,6 +105,7 @@ const FactureScreen = () => {
 
   const initialisePaiement = async () => {
     try {
+      const currentDate = new Date().toLocaleString();
       const { clientName, addressClient, montantFacture, mois, annee } =
         factureData;
 
@@ -121,6 +122,7 @@ const FactureScreen = () => {
             numeroPayeur: SOLANA_WALLET_PUBLIC_KEY,
             refFacture: refFacture,
             refClient: refClient,
+            datePaiement: currentDate,
             montantFacture: montantFacture,
             nomClient: clientName,
             adresseClient: addressClient,
@@ -512,6 +514,12 @@ const styles = StyleSheet.create({
   modal: {
     position: "relative",
   },
+  modalContainer: {
+    display: "flex",
+    alignItems:"flex-start",
+    justifyContent: "flex-start",
+    marginLeft: -20
+  }, 
 });
 
 export default FactureScreen;
