@@ -16,11 +16,11 @@ import {GetFromSecureStore, SaveToSecureStore} from "@/services/SecureStore"
 
 const CreateWalletPage = ({ navigation }) => {
   const [wallet, setWallet] = useState(null);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [cin, setCin] = useState("");
-  const [walletName, setWalletName] = useState("");
-  const [walletDescription, setWalletDescription] = useState("");
+  const [firstName, setFirstName] = useState("Najoro");
+  const [lastName, setLastName] = useState("Fanantenana");
+  const [cin, setCin] = useState("101 211 241 270");
+  const [walletName, setWalletName] = useState("Wallet Vka");
+  const [walletDescription, setWalletDescription] = useState("V");
   const [image, setImage] = useState(null);
   const [dataSecureStore, setdataSecureStore] = useState(null);
 
@@ -39,15 +39,20 @@ const CreateWalletPage = ({ navigation }) => {
   };
 
   const createWallet = async () => {
+    
     try {
-      const keypair = Keypair.generate();
-      const secretKey = JSON.stringify(Array.from(keypair.secretKey));
-      const publicKey = keypair.publicKey.toBase58();
+      if(firstName == "" || lastName == "" || cin == "" || walletName == ""){
+        Alert.alert("Veuillez remplir correctement les champs");
+      }else{
 
-      // Sauvegarde sécurisée de la clé privée
-      await SecureStore.setItemAsync(publicKey, secretKey);
-
-      const newWallet = {
+        const keypair = Keypair.generate();
+        const secretKey = JSON.stringify(Array.from(keypair.secretKey));
+        const publicKey = keypair.publicKey.toBase58();
+        
+        // Sauvegarde sécurisée de la clé privée
+        await SecureStore.setItemAsync(publicKey, secretKey);
+        
+        const newWallet = {
         firstName,
         lastName,
         cin,
@@ -57,15 +62,16 @@ const CreateWalletPage = ({ navigation }) => {
         secretKey,
         image,
       };
-
+      
       setWallet(newWallet);
       await SaveToSecureStore("walletInfo", newWallet);
       const getInSS = await GetFromSecureStore("walletInfo");
       setdataSecureStore(getInSS);
       Alert.alert("Succès", "Votre wallet a été créé avec succès !");
-
+      
       // Envoyer les données du wallet à la page Home
       navigation.navigate("Home", { wallet: newWallet });
+    }
     } catch (error) {
       Alert.alert("Erreur", "Échec de la création du wallet");
       console.error(error);
@@ -75,7 +81,8 @@ const CreateWalletPage = ({ navigation }) => {
   const copyToClipboard = () => {
     Clipboard.setString(wallet.publicKey);
     Alert.alert("Copié", "Adresse publique copiée dans le presse-papier");
-  };  
+  }; 
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Créer un Nouveau Wallet</Text>
@@ -111,7 +118,7 @@ const CreateWalletPage = ({ navigation }) => {
         onPress={() => navigation.navigate("Home")}
         style={styles.button}
       >
-        Aller à l'Accueil
+        Annuler la creations
       </Button>
     </View>
   );

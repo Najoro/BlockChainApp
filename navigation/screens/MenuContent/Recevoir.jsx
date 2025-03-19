@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet , TouchableOpacity,Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet , TouchableOpacity,Alert,Clipboard } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import DropdownComponent from "../../../components/DropdownComponent ";
 // import Clipboard  from "@react-native-clipboard/clipboard";
@@ -13,17 +13,19 @@ const pubkey = SOLANA_WALLET_PUBLIC_KEY;
 
 function Recevoir() {
   const pkSs = pkSecureStore();
-  const walletAddress = pkSs;
+  let walletAddress = "pas de Wallet";
+  
+  if(pkSs != null) {
+    walletAddress  = pkSs
+  }
  
   const handleClick = () => {
     alert("Copier");
   }
-  
-  const handleCopieClick = () => {
-    // Clipboard.setString(walletAddress);
-    Alert.alert('Copié !', 'Le texte a été copié dans le presse-papiers.');
-    }
-
+  const copyToClipboard = () => {
+    Clipboard.setString(walletAddress);
+    Alert.alert("Copié", "L'address a bien été  copiée");
+  }; 
   return (
     <>
       <View>
@@ -37,7 +39,7 @@ function Recevoir() {
         </View>
       </View>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={[styles.button,styles.copyButton]} onPress={handleCopieClick}>
+        <TouchableOpacity style={[styles.button,styles.copyButton]} onPress={copyToClipboard}>
           <Text style={styles.buttonText}>Copie address</Text>
         </TouchableOpacity>
 

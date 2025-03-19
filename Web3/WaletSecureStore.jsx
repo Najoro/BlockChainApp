@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {GetFromSecureStore} from "./../services/SecureStore";
 
 export const pkSecureStore = () => { 
-    const [pk, setPk] = useState("5dL2fzK5no6m4Q8GUK14zfYQrj27sf6gzrpu2hnz4NF9");
+    const [pk, setPk] = useState(null);
 
     useEffect(() => {
         const fetchSecureStore = async () => {
@@ -16,7 +16,8 @@ export const pkSecureStore = () => {
                 console.error("Erreur lors de la récupération des données du SecureStore :", error);
             }
         };
-
+        console.log(pk);
+        
         fetchSecureStore();
     }, []);
     

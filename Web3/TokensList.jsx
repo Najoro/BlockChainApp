@@ -17,8 +17,8 @@ const TokensList = () => {
     <View>
       <View>
         <Text style={styles.title}>Token associé</Text>
-        <TokenVkaDisplay/>
-        <TokenWithoutVkaDisplay/>
+        <TokenDisplay/>
+        {/* <TokenWithoutVkaDisplay/> */}
       </View>
     </View>
   )
