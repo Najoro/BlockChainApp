@@ -8,7 +8,8 @@ export const pkSecureStore = () => {
         const fetchSecureStore = async () => {
             try {
                 const dataSecureStore = await GetFromSecureStore("walletInfo");
-                if (dataSecureStore && dataSecureStore.publicKey) {
+                
+                if (dataSecureStore.publicKey) {
                     setPk(dataSecureStore.publicKey);
                 }
             } catch (error) {
@@ -18,7 +19,7 @@ export const pkSecureStore = () => {
 
         fetchSecureStore();
     }, []);
-
+    
     return pk;
 };
 

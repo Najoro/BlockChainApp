@@ -1,32 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { AccountLayout, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey } from "@solana/web3.js";
-import { View, TouchableOpacity, ActivityIndicator } from "react-native";
-import ImageTextCard from "@/navigation/screens/HomeContent/ImageTextCard";
-import { useNavigation } from "@react-navigation/native";
-import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
+import {
+  View,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { SOLANA_WALLET_PUBLIC_KEY, SOLANA_RPC_URL, CPG } from "@/app.config";
-import { Connection, clusterApiUrl } from "@solana/web3.js";
-
-const cn = new Connection(SOLANA_RPC_URL);
-const pk = SOLANA_WALLET_PUBLIC_KEY;
-
+import { useNavigation } from "@react-navigation/native";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { AccountLayout, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
+import ImageTextCard from "@/navigation/screens/HomeContent/ImageTextCard";
+import { SOLANA_RPC_URL, CPG, SOLANA_WALLET_PUBLIC_KEY } from "@/app.config";
+import { pkSecureStore } from "./WaletSecureStore";
 import { Buffer } from "buffer";
 
+// Configuration globale
 global.Buffer = Buffer;
-// Adresse du programme Metaplex Token Metadata
+const connection = new Connection(SOLANA_RPC_URL);
 const METADATA_PROGRAM_ID = new PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
 
-const fetchTokens = async (connection = cn, publicKey = pk) => {
+/** UTILS FUNCTIONS **/
+
+const fetchTokens = async (pubkey) => {
+  console.log('fech hook pk :', pubkey);
+
   try {
     const tokenAccounts = await connection.getTokenAccountsByOwner(
-      new PublicKey(publicKey),
-      {
-        programId: TOKEN_2022_PROGRAM_ID,
-      }
+      new PublicKey(pubkey),
+      { programId: TOKEN_2022_PROGRAM_ID }
     );
 
     return await Promise.all(
@@ -35,7 +38,6 @@ const fetchTokens = async (connection = cn, publicKey = pk) => {
         const mintAddress = new PublicKey(accountData.mint).toBase58();
         const amount = parseInt(accountData.amount) / 10 ** 9;
 
-        const metadata = await getTokenMetadata(connection, mintAddress);
         return {
           mintAddress,
           amount,
@@ -52,69 +54,77 @@ const fetchTokens = async (connection = cn, publicKey = pk) => {
   }
 };
 
-//get metadata
-async function getTokenMetadata(connection, tokenMintAddress) {
+const getTokenMetadata = async (tokenMintAddress) => {
   try {
     const mintPublicKey = new PublicKey(tokenMintAddress);
-
-    // Trouver l'adresse des métadonnées associées au token
     const [metadataPDA] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("metadata"),
-        METADATA_PROGRAM_ID.toBuffer(),
-        mintPublicKey.toBuffer(),
-      ],
+      [Buffer.from("metadata"), METADATA_PROGRAM_ID.toBuffer(), mintPublicKey.toBuffer()],
       METADATA_PROGRAM_ID
     );
-    // console.log("metadataPDA:", metadataPDA.toBase58());
 
-    // Récupérer les informations du compte
     const accountInfo = await connection.getAccountInfo(metadataPDA);
     if (accountInfo) {
-      const metadata = Metadata.deserialize(accountInfo.data)[0];
-      console.log("Metadata :", metadata);
-    } else {
-      // console.log(
-      //   "Aucune metadata trouvée pour ce token.",
-      //   metadataPDA.toBase58()
-      // );
+      return Metadata.deserialize(accountInfo.data)[0];
     }
   } catch (error) {
     console.error("Erreur lors de la récupération des métadonnées :", error);
   }
-}
-
-const GetTokenAccount = ({ connection = cn, publicKey = pk }) => {
-  const [tokens, setTokens] = useState([]);
-
-  useEffect(() => {
-    (async () => {
-      const tokenList = await fetchTokens(connection, publicKey);
-      setTokens(tokenList);
-    })();
-  }, [publicKey, connection]);
-
-  return tokens;
+  return null;
 };
 
-const TokenDisplay = ({ connection = cn, publicKey = pk }) => {
+/** CUSTOM HOOK **/
+
+  const useTokenAccounts = () => {
+    const [tokens, setTokens] = useState([]);
+    const walletAddress = pkSecureStore();
+    
+    useEffect(() => {
+      (async () => {
+        const tokenList = await fetchTokens(walletAddress);
+        setTokens(tokenList);
+      })();
+    }, [walletAddress]);
+
+    return tokens.length != 0 ? tokens : null;
+  };
+
+/** COMPONENTS **/
+
+const EachRenderTokenDisplay = ({ token, isVka }) => {
   const navigation = useNavigation();
-  const tokens = GetTokenAccount({ connection, publicKey });
+
+  return (
+    <TouchableOpacity onPress={() => navigation.navigate("Envoyer", { token: token.mintAddress })}>
+      <ImageTextCard
+        imageSource={{ uri: token.image }}
+        title={isVka ? CPG.name : token.name}
+        description={`${token.amount} ${isVka ? CPG.symbole : token.symbol}`}
+      />
+    </TouchableOpacity>
+  );
+};
+
+const TokenDisplay = () => {
+  const tokens = useTokenAccounts();
+
+  if(tokens == null) {
+    return <Text>Pas de token associer</Text>
+  }
   return (
     <View>
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
         tokens.map((token, index) => (
-          <EachRenderTokenDisplay index={index} token={token} isVka={false} />
+          <EachRenderTokenDisplay key={token.mintAddress || index} token={token} isVka={false} />
         ))
       )}
     </View>
   );
 };
 
-const TokendropDownDisplay = ({ connection = cn, publicKey = pk }) => {
-  const tokens = GetTokenAccount({ connection, publicKey });
+const TokendropDownDisplay = () => {
+  const tokens = useTokenAccounts();
   const [selectedValue, setSelectedValue] = useState("");
 
   return (
@@ -122,105 +132,87 @@ const TokendropDownDisplay = ({ connection = cn, publicKey = pk }) => {
       {tokens.length === 0 ? (
         <ActivityIndicator size="large" color="#007bff" />
       ) : (
-        <Picker
-          selectedValue={selectedValue}
-          onValueChange={(itemValue) => setSelectedValue(itemValue)}
-        >
+        <Picker selectedValue={selectedValue} onValueChange={setSelectedValue}>
           {tokens.map((token, index) => (
-            <Picker.Item
-              key={index}
-              label={token.mintAddress}
-              value={token.mintAddress}
-            />
+            <Picker.Item key={token.mintAddress || index} label={token.mintAddress} value={token.mintAddress} />
           ))}
         </Picker>
       )}
     </View>
   );
 };
-/**VOLANAKA --------------------------------------------------------------------------- */
-const TokenVkaDisplay = ({ connection = cn, publicKey = pk }) => {
-  const navigation = useNavigation();
-  const tokens = GetTokenAccount({ connection, publicKey });
-  return (
-    <View>
-      {tokens.length === 0 ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : (
-        tokens.map((token,index) =>
-            token.mintAddress == CPG.mintAddress && (
-              <EachRenderTokenDisplay  key={token.mintAddress || index} index={index} isVka={true} token={token} />
-          )
-        )
-      )}
+
+const TokenVkaDisplay = () => {
+  const tokens = useTokenAccounts();
+  if(tokens == null) {
+    return <Text>Pas de token associer</Text>
+  }else if(tokens.length == 0) {
+    return <ActivityIndicator size="large" color="#007bff" />
+  }else{
+    return(
+      <View>
+        {tokens
+            .filter((token) => token.mintAddress === CPG.mintAddress)
+            .map((token, index) => (
+              <EachRenderTokenDisplay key={token.mintAddress || index} token={token} isVka={true} />
+            ))}
     </View>
-  );
+    )
+  }
+  // return (
+  //   <View>
+  //     {tokens.length === 0 ? (
+  //       <ActivityIndicator size="large" color="#007bff" />
+  //     ) : (
+  //       tokens
+  //         .filter((token) => token.mintAddress === CPG.mintAddress)
+  //         .map((token, index) => (
+  //           <EachRenderTokenDisplay key={token.mintAddress || index} token={token} isVka={true} />
+  //         ))
+  //     )}
+  //   </View>
+  // );
 };
 
-const TokenWithoutVkaDisplay = ({ connection = cn, publicKey = pk }) => {
-  const navigation = useNavigation();
-  const tokens = GetTokenAccount({ connection, publicKey });
-  return (
-    <View>
-      {tokens.length === 0 ? (
-        <ActivityIndicator size="large" color="#007bff" />
-      ) : (
-        tokens.map((token, index) =>
-            token.mintAddress != CPG.mintAddress && (
-              <EachRenderTokenDisplay key={token.mintAddress || index} index={index} token={token} />
-          )
-        )
-      )}
+const TokenWithoutVkaDisplay = () => {
+  const tokens = useTokenAccounts();
+  if(tokens == null) {
+    return <Text>Pas de token associer</Text>
+  }else if(tokens.length == 0) {
+    return <ActivityIndicator size="large" color="#007bff" />
+  }else{
+    return(
+      <View>
+        {tokens
+            .filter((token) => token.mintAddress !== CPG.mintAddress)
+            .map((token, index) => (
+              <EachRenderTokenDisplay key={token.mintAddress || index} token={token} isVka={true} />
+            ))}
     </View>
-  );
+    )
+  }
+  // return (
+  //   <View>
+  //     {tokens.length === 0 ? (
+  //       <ActivityIndicator size="large" color="#007bff" />
+  //     ) : (
+  //       tokens
+  //         .filter((token) => token.mintAddress !== CPG.mintAddress)
+  //         .map((token, index) => (
+  //           <EachRenderTokenDisplay key={token.mintAddress || index} token={token} isVka={false} />
+  //         ))
+  //     )}
+  //   </View>
+  // );
 };
 
 const getVkaAmount = () => {
-  const tokens = GetTokenAccount(cn, pk);
-  const [vkaAmount, setVkaAmount] = useState(0);
-  useEffect(() => {
-    tokens.forEach((token) => {
-      if (token.mintAddress === CPG.mintAddress) {
-        setVkaAmount(token.amount);
-      }
-    });
-  }, [tokens, CPG]);
-
-  return vkaAmount.toLocaleString("fr-FR");
-};
-
-
-/**FUNCTIONS ---------------------------------------------------------- */
-const EachRenderTokenDisplay = ({ token, index, isVka = false }) => {
-  const navigation = useNavigation();
-  const handelPress = () => {
-    navigation.navigate("Envoyer", { token: token.mintAddress });
-  };
-  return (
-    <>
-      {isVka ? (
-        <TouchableOpacity key={index} onPress={handelPress}>
-          <ImageTextCard
-            imageSource={{ uri: token.image }}
-            title={CPG.name}
-            description={token.amount + " " + CPG.symbole}
-          />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity key={index} onPress={handelPress}>
-          <ImageTextCard
-            imageSource={{ uri: token.image }}
-            title={token.name}
-            description={token.amount + " " + token.symbol}
-          />
-        </TouchableOpacity>
-      )}
-    </>
-  );
+  const tokens = useTokenAccounts();
+  const vkaToken = tokens.find((token) => token.mintAddress === CPG.mintAddress);
+  return vkaToken ? vkaToken.amount.toLocaleString("fr-FR") : "0";
 };
 
 export {
-  GetTokenAccount,
   TokenDisplay,
   TokendropDownDisplay,
   TokenVkaDisplay,
